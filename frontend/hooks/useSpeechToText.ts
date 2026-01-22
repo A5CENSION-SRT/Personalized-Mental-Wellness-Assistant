@@ -91,17 +91,38 @@ export function useSpeechToText(
     if (isListening) {
       try {
         recognitionRef.current.stop();
-        setIsListening(false);
-        setInterimTranscript('');
       } catch (error) {
         console.error('Error stopping recognition:', error);
+        setIsListening(false);
+        setInterimTranscript('');
       }
     } else {
       try {
-        recognitionRef.current.start();
-        setIsListening(true);
+        // Force stop first in case it's in a weird state
+        try {
+          recognitionRef.current.stop();
+        } catch (e) {
+          // Ignore errors from stopping when not running
+        }
+        
+        // Small delay to ensure clean state
+        setTimeout(() => {
+          try {
+            recognitionRef.current.start();
+            setIsListening(true);
+          } catch (error: any) {
+            console.error('Failed to start recognition:', error);
+            setIsListening(false);
+            
+            // Handle specific error cases
+            if (error.message?.includes('already started')) {
+              // Recognition is already running, just update state
+              setIsListening(true);
+            }
+          }
+        }, 100);
       } catch (error) {
-        console.error('Failed to start recognition:', error);
+        console.error('Error initializing recognition:', error);
         setIsListening(false);
       }
     }
