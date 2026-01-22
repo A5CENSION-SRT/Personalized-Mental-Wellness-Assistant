@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useRef, useEffect, Suspense } from 'react';
-import { Send, LogOut, Sparkles, User as UserIcon, Menu, X } from 'lucide-react';
+import { Send, LogOut, Sparkles, User as UserIcon, Menu, X, Mic } from 'lucide-react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { createClient } from '@/lib/supabase/client';
 import FitbitWidget from '@/components/FitbitWidget';
@@ -10,6 +10,7 @@ import ThemeToggle from '@/components/ThemeToggle';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 import { cn } from '@/lib/utils';
+import { useSpeechToText } from '@/hooks/useSpeechToText';
 
 interface Message {
   id: string;
@@ -28,6 +29,16 @@ function DashboardContent() {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
   const searchParams = useSearchParams();
+
+  // Speech-to-text hook
+  const handleTranscript = (text: string) => {
+    setInputMessage((prev) => 
+      prev ? `${prev} ${text}`.trim() : text
+    );
+  };
+  
+  const { isListening, interimTranscript, toggleListening, isSupported } = 
+    useSpeechToText(handleTranscript);
 
   useEffect(() => {
     const supabase = createClient();
@@ -387,12 +398,36 @@ function DashboardContent() {
               )}>
                 <input
                   type="text"
-                  value={inputMessage}
+                  value={inputMessage + (interimTranscript ? ' ' + interimTranscript : '')}
                   onChange={(e) => setInputMessage(e.target.value)}
                   placeholder="Share what's on your mind..."
                   className="flex-1 bg-transparent focus:outline-none text-foreground placeholder:text-muted-foreground"
                   disabled={isLoading}
                 />
+                
+                {/* Microphone Button */}
+                {isSupported && (
+                  <button
+                    type="button"
+                    onClick={toggleListening}
+                    disabled={isLoading}
+                    className={cn(
+                      "p-3 rounded-xl transition-all duration-300 relative",
+                      isListening
+                        ? "bg-green-500 text-white shadow-lg shadow-green-500/50 animate-pulse"
+                        : "bg-muted hover:bg-muted/80 text-muted-foreground",
+                      "disabled:opacity-50 disabled:cursor-not-allowed"
+                    )}
+                    title={isListening ? "Stop Recording" : "Start Voice Input"}
+                  >
+                    <Mic className="w-5 h-5" />
+                    {/* Animated indicator when listening */}
+                    {isListening && (
+                      <span className="absolute -top-1 -right-1 w-3 h-3 bg-green-400 rounded-full animate-ping"></span>
+                    )}
+                  </button>
+                )}
+                
                 <button
                   type="submit"
                   disabled={!inputMessage.trim() || isLoading}
@@ -408,6 +443,16 @@ function DashboardContent() {
                   <Send className="w-5 h-5" />
                 </button>
               </div>
+              
+              {/* Interim transcript display */}
+              {interimTranscript && (
+                <div className="mt-2 text-center animate-in fade-in slide-in-from-bottom-2 duration-300">
+                  <p className="text-sm text-muted-foreground italic">
+                    Listening: <span className="text-foreground">{interimTranscript}</span>
+                  </p>
+                </div>
+              )}
+              
               <p className="text-xs text-muted-foreground mt-3 text-center">
                 Powered by Local AI (Ollama) • Your conversations are private and secure
               </p>
