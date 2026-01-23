@@ -20,6 +20,47 @@ You can start editing the page by modifying `app/page.tsx`. The page auto-update
 
 This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
 
+## Google Cloud Text-to-Speech (TTS)
+
+Server route is available at `/api/tts` and requires either Application Default Credentials (ADC) or inline JSON credentials via env.
+
+Configure credentials on your machine without committing secrets:
+
+- Inline JSON (preferred on Windows PowerShell):
+
+```powershell
+$env:GOOGLE_TTS_CREDENTIALS_JSON = Get-Content "C:\\Users\\Sujal B\\OneDrive\\Desktop\\tts.json" -Raw
+```
+
+- Or ADC file path:
+
+```powershell
+$env:GOOGLE_APPLICATION_CREDENTIALS = "C:\\Users\\Sujal B\\OneDrive\\Desktop\\tts.json"
+```
+
+Client usage example:
+
+```tsx
+import TextToSpeechButton from "@/components/TextToSpeechButton";
+
+export default function Demo() {
+	return (
+		<TextToSpeechButton text="Hello from TTS" options={{ languageCode: "en-US" }} />
+	);
+}
+```
+
+API call example:
+
+```powershell
+Invoke-WebRequest -Uri "http://localhost:3000/api/tts" -Method POST `
+	-ContentType "application/json" `
+	-Body '{"text":"Hello, this is a Google Cloud TTS test.","languageCode":"en-US"}' `
+	-OutFile "tts.mp3"
+```
+
+Security note: never commit service account JSON. Use env vars.
+
 ## Learn More
 
 To learn more about Next.js, take a look at the following resources:
