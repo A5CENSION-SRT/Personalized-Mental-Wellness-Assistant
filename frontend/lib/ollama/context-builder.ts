@@ -149,21 +149,30 @@ export function buildDeepSeekPrompt(
     console.log('\n[CONTEXT BUILDER]');
     console.log('Tools called:', context.toolsUsed.join(', ') || 'None');
 
+    // Debug: Check if we have summarized context
+    const hasSummarizedContext = 'summarizedContext' in context && context.summarizedContext;
+    console.log('Has summarized context:', hasSummarizedContext);
+    if (hasSummarizedContext) {
+        console.log('Summarized context preview:', (context as SummarizedOrchestratedContext).summarizedContext.substring(0, 200) + '...');
+    }
+
     const userName = options?.userName || 'Student';
 
-    // Check if we have summarized context
-    const hasSummarizedContext = 'summarizedContext' in context && context.summarizedContext;
     const summarizedContext = hasSummarizedContext ? (context as SummarizedOrchestratedContext) : null;
 
     // ALWAYS use summarized context if available (prevents timeout)
     let contextText = '';
     if (summarizedContext?.summarizedContext) {
         contextText = summarizedContext.summarizedContext;
+        console.log('✅ Using Flash summarized context');
     } else {
         // Fallback: mini summary
         contextText = `User has ${context.memories.length} memories.`;
         if (context.fitbitData) contextText += ' Health data available.';
+        console.log('⚠️ Using fallback context (no Flash summary)');
     }
+
+    console.log('Final context text length:', contextText.length);
 
     // Add crisis context
     if (options?.isCrisis) {
@@ -179,16 +188,22 @@ export function buildDeepSeekPrompt(
         : '';
 
     // Ultra-concise prompt
-    return `You are a warm mental health companion talking to ${userName}.
-
-## Context:
-${contextText}
+    const finalPrompt = `You are a compassionate mental health companion talking to ${userName}.
 
 ${historyText ? `## Recent Chat:\n${historyText}\n` : ''}## ${userName}'s Message:
 ${userMessage}
 
-## Response:
-Be warm, supportive, concise (under 100 words). Reference health data with specific values when relevant.`;
+## Important Context About ${userName}:
+${contextText}
+
+## Your Response:
+Use the context above to provide personalized, empathetic support. Reference specific details from their health data, memories, and situation. Be warm but comprehensive (aim for 150-200 words). ${options?.isCrisis ? 'PRIORITIZE IMMEDIATE SAFETY AND CRISIS RESOURCES.' : ''}`;
+
+    console.log('\n[FINAL PROMPT FOR OLLAMA]');
+    console.log('Prompt length:', finalPrompt.length);
+    console.log('Context section preview:', contextText.substring(0, 100) + '...');
+
+    return finalPrompt;
 }
 
 /**

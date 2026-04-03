@@ -121,7 +121,7 @@ export async function POST(request: NextRequest) {
       message,
       conversationHistory || [],
       userName,
-      5000,
+      30000, // Increased to 30 seconds to allow Flash summarization to complete
       profile
     );
 

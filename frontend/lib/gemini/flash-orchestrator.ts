@@ -53,24 +53,32 @@ const ORCHESTRATOR_SYSTEM_PROMPT = `You are an intelligent context orchestrator 
 
 NOTE: User memories and Fitbit health data are ALWAYS fetched automatically. You only need to decide about RAG.
 
-Call queryRAG ONLY when:
-1. User asks about mental health concepts, conditions, or techniques (CBT, anxiety disorders, depression, etc.)
-2. User needs evidence-based coping strategies or therapeutic techniques
-3. User asks educational questions about psychology or mental health
-4. User needs professional guidance on specific mental health topics
+Call queryRAG for almost ALL mental health conversations except simple greetings:
+1. Any emotional distress (sad, anxious, overwhelmed, stressed, down, etc.)
+2. Health concerns affecting mental state
+3. Requests for help, support, or coping strategies
+4. Mentions of difficult life situations or challenges
+5. Educational questions about mental health
+6. Crisis situations or concerning thoughts
+7. Sleep, energy, or wellness concerns affecting mood
+8. Relationship, work, or academic stress
 
-DO NOT call queryRAG for:
-1. Personal conversations about their day, feelings, or experiences
-2. Greetings or casual chat
-3. Questions about their own health data or past conversations
-4. General emotional support without need for educational content
+ONLY skip queryRAG for:
+1. Simple greetings ("Hi", "Hello", "Good morning")  
+2. Brief acknowledgments ("Thanks", "OK", "Got it")
+3. Very specific metric queries ("How many steps exactly?", "What was my heart rate at 3pm?")
+
+When in doubt → CALL queryRAG. It's better to have too much context than too little.
 
 Examples:
-- "Tell me about CBT" → queryRAG (educational)
-- "What are some techniques for exam anxiety?" → queryRAG (coping strategies)
-- "I'm feeling sad today" → NO tools (personal, memories/fitbit auto-fetched)
-- "How did I sleep?" → NO tools (health data auto-fetched)
-- "Hi, how are you?" → NO tools`;
+- "I'm feeling down" → queryRAG ✅
+- "My health is affecting my mood" → queryRAG ✅  
+- "How is my health data?" → queryRAG ✅ (needs interpretation)
+- "Tell me about my wellness" → queryRAG ✅
+- "I'm struggling" → queryRAG ✅
+- "Having a tough day" → queryRAG ✅
+- "Hello" → NO tools ❌
+- "Thanks" → NO tools ❌`;
 
 /**
  * Main orchestration function
@@ -110,6 +118,9 @@ export async function orchestrateContext(
         // ============================================================
         // PHASE 1: Parallel tool execution
         // ============================================================
+        console.log('🔄 ORCHESTRATOR: Starting parallel tool execution...');
+        const toolsStart = Date.now();
+        
         const [memoriesResult, fitbitResult, recentWellnessResult, userProfileResult, ragDecision] = await Promise.allSettled([
             // Always fetch memories
             executeSearchMemories(userId, { query: userMessage }),
@@ -122,6 +133,8 @@ export async function orchestrateContext(
             // Ask Flash if RAG is needed (fast decision)
             shouldCallRAG(userMessage, conversationHistory),
         ]);
+
+        console.log('✅ ORCHESTRATOR: Parallel tool execution completed in', Date.now() - toolsStart, 'ms');
 
         // Process memories result
         if (memoriesResult.status === 'fulfilled' && memoriesResult.value) {
@@ -181,6 +194,9 @@ export async function orchestrateContext(
         // ============================================================
         // PHASE 2: Summarize all context with Flash
         // ============================================================
+        console.log('🔄 ORCHESTRATOR: Starting Flash summarization...');
+        const summaryStart = Date.now();
+        
         const summaryResult = await summarizeContext(
             userMessage,
             context,
@@ -188,6 +204,8 @@ export async function orchestrateContext(
             userName,
             userProfile
         );
+
+        console.log('✅ ORCHESTRATOR: Flash summarization completed in', Date.now() - summaryStart, 'ms');
 
         context.summarizedContext = summaryResult.summary;
         context.keyPoints = summaryResult.keyPoints;

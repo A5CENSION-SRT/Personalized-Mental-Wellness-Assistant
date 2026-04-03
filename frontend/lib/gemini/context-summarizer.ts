@@ -24,16 +24,16 @@ export interface ContextSummary {
 const SUMMARIZER_SYSTEM_PROMPT = `You are a context summarizer for a mental health chatbot. Your job is to convert structured context data into a NATURAL CONVERSATIONAL PARAGRAPH.
 
 CRITICAL RULES:
-1. OUTPUT ONLY 1-2 SENTENCES IN PARAGRAPH FORM
+1. OUTPUT 2-3 SENTENCES IN PARAGRAPH FORM
 2. NO structural labels, headers, bullet points, or sections
 3. ALWAYS lead with the user's name: "[Name] has..."
-4. Include SPECIFIC health metrics ONLY if highly relevant
-5. Reference key memories only when relevant to the message
+4. INCLUDE SPECIFIC health metrics like steps, calories, heart rate, sleep hours when available
+5. Reference key memories when present
 6. Sound warm, personal, and natural - like a real therapist
 7. NEVER output any structured data, lists, or formatting markers
 
 GOOD EXAMPLE:
-"Sarah has been managing stress around upcoming exams and has been averaging 3,500 steps daily with a resting heart rate of 72 bpm. She mentioned feeling disconnected recently but is focused on scheduling activities that bring her joy."
+"Sarah has been managing stress around upcoming exams and has been averaging 3,500 steps daily with 2,100 calories burned and a resting heart rate of 72 bpm. She mentioned feeling disconnected recently but is focused on scheduling activities that bring her joy. Her sleep has been averaging 6.5 hours with 83% efficiency."
 
 BAD EXAMPLES:
 ❌ "## USER DATA: Sarah has..."
@@ -73,7 +73,7 @@ Message: "${userMessage}"
 Context data:
 ${rawContext}
 
-Create a 1-2 sentence summary. Start with "${userName} has..." and keep it conversational.`;
+Create a 2-3 sentence summary. Start with "${userName} has..." and include specific health metrics like calories, steps, heart rate, and sleep when available. Keep it conversational and comprehensive.`;
 
         const response = await client.models.generateContent({
             model: flashConfig.model,
@@ -83,7 +83,7 @@ Create a 1-2 sentence summary. Start with "${userName} has..." and keep it conve
                 { role: 'user', parts: [{ text: prompt }] },
             ],
             config: {
-                maxOutputTokens: 512,
+                maxOutputTokens: 1024,
                 temperature: 0.3,
             },
         });
