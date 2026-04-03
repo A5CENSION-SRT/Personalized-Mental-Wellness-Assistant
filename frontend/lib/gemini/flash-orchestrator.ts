@@ -120,7 +120,7 @@ export async function orchestrateContext(
         // ============================================================
         console.log('🔄 ORCHESTRATOR: Starting parallel tool execution...');
         const toolsStart = Date.now();
-        
+
         const [memoriesResult, fitbitResult, recentWellnessResult, userProfileResult, ragDecision] = await Promise.allSettled([
             // Always fetch memories
             executeSearchMemories(userId, { query: userMessage }),
@@ -196,7 +196,7 @@ export async function orchestrateContext(
         // ============================================================
         console.log('🔄 ORCHESTRATOR: Starting Flash summarization...');
         const summaryStart = Date.now();
-        
+
         const summaryResult = await summarizeContext(
             userMessage,
             context,
