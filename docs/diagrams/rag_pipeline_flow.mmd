@@ -1,0 +1,21 @@
+flowchart LR
+    subgraph Ingestion["Document Ingestion & Indexing"]
+        PDF[PDF Upload]:::frontend --> Docling[Docling Parser Container]:::api
+        Docling --> Chunks[Text Chunking & Metadata Extraction]:::agent
+        Chunks --> Embed[Nomic Embed Text via Ollama]:::agent
+        Embed --> PineconeDB[("Pinecone Vector DB<br/>(mental-health-rag)")]:::database
+    end
+    
+    subgraph Retrieval["Query & Context Retrieval"]
+        UserQuery[User Educational Query]:::user --> QueryEmbed[Generate Query Vector]:::agent
+        QueryEmbed --> VectorSearch[Cosine Similarity Search]:::agent
+        PineconeDB --> VectorSearch
+        VectorSearch --> Context[Retrieve Top K Context Chunks]:::frontend
+    end
+
+    classDef user fill:#f3f4f6,stroke:#6b7280,stroke-width:1.5px,color:#111827;
+    classDef frontend fill:#dbeafe,stroke:#3b82f6,stroke-width:1.5px,color:#1e3a8a;
+    classDef api fill:#f3e8ff,stroke:#a855f7,stroke-width:1.5px,color:#581c87;
+    classDef agent fill:#fef3c7,stroke:#f59e0b,stroke-width:1.5px,color:#78350f;
+    classDef database fill:#dcfce7,stroke:#22c55e,stroke-width:1.5px,color:#14532d;
+    classDef external fill:#ffe4e6,stroke:#f43f5e,stroke-width:1.5px,color:#881337;

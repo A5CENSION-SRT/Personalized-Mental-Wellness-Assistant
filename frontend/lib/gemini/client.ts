@@ -98,7 +98,7 @@ export async function generateWithContext(
 
   // Add AI-powered health analysis if available
   if (aiHealthInsights) {
-    healthDataText += '\n### 🤖 AI Health Analysis:\n';
+    healthDataText += '\n###  AI Health Analysis:\n';
     healthDataText += `**Summary:** ${aiHealthInsights.summary}\n`;
     healthDataText += `**Mental Health Impact:** ${aiHealthInsights.mentalHealthCorrelation}\n`;
     healthDataText += `**Urgency Level:** ${aiHealthInsights.urgencyLevel.toUpperCase()}\n`;
@@ -164,16 +164,16 @@ ${userMessage}
 Your response:`;
 
   try {
-    console.log('🔵 OLLAMA: Generating response with local model...');
+    console.log(' OLLAMA: Generating response with local model...');
     const text = await ollamaGenerateText(prompt, {
       temperature: 0.7,
       maxTokens: 2048,
     });
-    console.log('🟢 OLLAMA: Response generated successfully');
+    console.log(' OLLAMA: Response generated successfully');
 
     return text;
   } catch (error: any) {
-    console.error('🔴 OLLAMA: API error:', {
+    console.error(' OLLAMA: API error:', {
       message: error.message,
       details: error
     });
@@ -194,12 +194,12 @@ Your response:`;
 // Generate embeddings using Ollama's embedding model
 export async function generateEmbedding(text: string): Promise<number[]> {
   try {
-    console.log('🔵 OLLAMA: Generating embedding...');
+    console.log(' OLLAMA: Generating embedding...');
     const embedding = await ollamaGenerateEmbedding(text);
-    console.log(`✅ Embedding generated (${embedding.length} dimensions)`);
+    console.log(` Embedding generated (${embedding.length} dimensions)`);
     return embedding;
   } catch (error: any) {
-    console.error('🔴 OLLAMA: Embedding error:', error.message);
+    console.error(' OLLAMA: Embedding error:', error.message);
 
     if (error.message?.includes('not running') || error.message?.includes('ECONNREFUSED')) {
       throw new Error('Ollama service is not running. Please start Ollama with: ollama serve');

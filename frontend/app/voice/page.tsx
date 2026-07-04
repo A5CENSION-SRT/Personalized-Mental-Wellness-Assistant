@@ -199,7 +199,7 @@ function VoiceModeContent() {
               {!isSupported && (
                 <div className="glass border-2 border-yellow-500/50 rounded-2xl p-6 max-w-md mt-6">
                   <p className="text-sm text-yellow-700 dark:text-yellow-300 text-center">
-                    ⚠️ Voice input not supported in this browser. Please use Chrome or Edge.
+                    ️ Voice input not supported in this browser. Please use Chrome or Edge.
                   </p>
                 </div>
               )}

@@ -47,13 +47,13 @@ async function enhanceQuery(userQuery: string): Promise<string> {
     const wordCount = userQuery.split(/\s+/).length;
     if (wordCount < 10 && keywords.length > 0) {
       const enhanced = `${userQuery} ${keywords.slice(0, 2).join(' ')}`;
-      console.log('🔍 RAG: Enhanced query (keyword expansion):', enhanced.substring(0, 100));
+      console.log(' RAG: Enhanced query (keyword expansion):', enhanced.substring(0, 100));
       return enhanced;
     }
 
     return userQuery;
   } catch (error) {
-    console.warn('⚠️ RAG: Query enhancement failed, using original query');
+    console.warn('️ RAG: Query enhancement failed, using original query');
     return userQuery;
   }
 }
@@ -69,17 +69,17 @@ export async function queryRAG(
   topK: number = 5
 ): Promise<RetrievedChunk[]> {
   try {
-    console.log('🔵 RAG: Processing query:', query.substring(0, 100));
+    console.log(' RAG: Processing query:', query.substring(0, 100));
 
     // Enhance query for better retrieval (fast keyword expansion)
     const enhancedQuery = await enhanceQuery(query);
 
-    console.log('🔵 RAG: Generating embedding for enhanced query...');
+    console.log(' RAG: Generating embedding for enhanced query...');
 
     // Generate embedding for the enhanced query using Ollama
     const queryEmbedding = await generateEmbedding(enhancedQuery);
 
-    console.log('🟢 RAG: Embedding generated, querying Pinecone...');
+    console.log(' RAG: Embedding generated, querying Pinecone...');
 
     // Query Pinecone - getPineconeClient() already returns the index
     const index = await getPineconeClient();
@@ -90,7 +90,7 @@ export async function queryRAG(
       includeMetadata: true,
     });
 
-    console.log('🟢 RAG: Found', queryResponse.matches.length, 'relevant chunks');
+    console.log(' RAG: Found', queryResponse.matches.length, 'relevant chunks');
 
     // Extract and format results
     const results: RetrievedChunk[] = queryResponse.matches.map(match => ({
@@ -108,12 +108,12 @@ export async function queryRAG(
     // Filter out low-quality matches (score < 0.3)
     const filteredResults = results.filter(r => r.score > 0.3);
 
-    console.log('🟢 RAG: Returning', filteredResults.length, 'high-quality chunks (scores:',
+    console.log(' RAG: Returning', filteredResults.length, 'high-quality chunks (scores:',
       filteredResults.map(r => r.score.toFixed(2)).join(', ') + ')');
 
     return filteredResults;
   } catch (error: any) {
-    console.error('🔴 RAG: Error querying vector database:', error);
+    console.error(' RAG: Error querying vector database:', error);
     throw new Error(`RAG query failed: ${error.message}`);
   }
 }

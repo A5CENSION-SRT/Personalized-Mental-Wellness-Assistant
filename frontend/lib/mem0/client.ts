@@ -11,11 +11,11 @@ export function getMem0Client(): MemoryClient {
     const apiKey = process.env.MEM0_API_KEY;
 
     if (!apiKey) {
-      console.error('🔴 MEM0: API key not found in environment variables');
+      console.error(' MEM0: API key not found in environment variables');
       throw new Error('MEM0_API_KEY is not set. Please add it to your .env.local file');
     }
 
-    console.log('🟢 MEM0: Initializing client');
+    console.log(' MEM0: Initializing client');
     mem0Client = new MemoryClient({ apiKey });
   }
 
@@ -51,9 +51,9 @@ export async function addMemory(
   }
 ): Promise<{ success: boolean; memoryIds?: string[]; error?: string }> {
   try {
-    console.log('🔵 MEM0: Adding memory for user:', userId.substring(0, 8) + '...');
-    console.log('🔵 MEM0: Messages count:', messages.length);
-    console.log('🔵 MEM0: Metadata:', metadata);
+    console.log(' MEM0: Adding memory for user:', userId.substring(0, 8) + '...');
+    console.log(' MEM0: Messages count:', messages.length);
+    console.log(' MEM0: Metadata:', metadata);
 
     const client = getMem0Client();
 
@@ -63,7 +63,7 @@ export async function addMemory(
     }) as any;
 
     // Debug: Log raw result
-    console.log('🔵 MEM0: Raw add result:', JSON.stringify(result, null, 2));
+    console.log(' MEM0: Raw add result:', JSON.stringify(result, null, 2));
 
     // Extract memory IDs from result - handle different response formats
     let memoryIds: string[] = [];
@@ -79,14 +79,14 @@ export async function addMemory(
       memoryIds = [result.id || result.memory_id];
     }
 
-    console.log('🟢 MEM0: Memory added successfully:', memoryIds.length, 'memories', memoryIds);
+    console.log(' MEM0: Memory added successfully:', memoryIds.length, 'memories', memoryIds);
 
     return {
       success: true,
       memoryIds,
     };
   } catch (error: any) {
-    console.error('🔴 MEM0: Error adding memory:', {
+    console.error(' MEM0: Error adding memory:', {
       message: error.message,
       userId: userId.substring(0, 8) + '...',
       metadata,
@@ -123,8 +123,8 @@ export async function searchMemories(
   error?: string;
 }> {
   try {
-    console.log('🔵 MEM0: Searching memories for user:', userId.substring(0, 8) + '...');
-    console.log('🔵 MEM0: Query:', query.substring(0, 100));
+    console.log(' MEM0: Searching memories for user:', userId.substring(0, 8) + '...');
+    console.log(' MEM0: Query:', query.substring(0, 100));
 
     const client = getMem0Client();
 
@@ -141,12 +141,12 @@ export async function searchMemories(
       };
     }
 
-    console.log('🔵 MEM0: Search options:', JSON.stringify(searchOptions, null, 2));
+    console.log(' MEM0: Search options:', JSON.stringify(searchOptions, null, 2));
 
     const result = await client.search(query, searchOptions) as any;
 
     // Debug: Log raw search result
-    console.log('🔵 MEM0: Raw search result:', JSON.stringify(result, null, 2));
+    console.log(' MEM0: Raw search result:', JSON.stringify(result, null, 2));
 
     // Parse results - handle different response formats
     let memories = [];
@@ -173,14 +173,14 @@ export async function searchMemories(
       }));
     }
 
-    console.log('🟢 MEM0: Found', memories.length, 'relevant memories');
+    console.log(' MEM0: Found', memories.length, 'relevant memories');
 
     return {
       success: true,
       memories,
     };
   } catch (error: any) {
-    console.error('🔴 MEM0: Error searching memories:', {
+    console.error(' MEM0: Error searching memories:', {
       message: error.message,
       userId: userId.substring(0, 8) + '...',
       query: query.substring(0, 100),
@@ -210,7 +210,7 @@ export async function getAllMemories(
   error?: string;
 }> {
   try {
-    console.log('🔵 MEM0: Getting all memories for user:', userId.substring(0, 8) + '...');
+    console.log(' MEM0: Getting all memories for user:', userId.substring(0, 8) + '...');
 
     const client = getMem0Client();
 
@@ -228,14 +228,14 @@ export async function getAllMemories(
       }))
       : [];
 
-    console.log('🟢 MEM0: Retrieved', memories.length, 'total memories');
+    console.log(' MEM0: Retrieved', memories.length, 'total memories');
 
     return {
       success: true,
       memories,
     };
   } catch (error: any) {
-    console.error('🔴 MEM0: Error getting all memories:', {
+    console.error(' MEM0: Error getting all memories:', {
       message: error.message,
       userId: userId.substring(0, 8) + '...',
     });
@@ -254,16 +254,16 @@ export async function deleteMemory(
   memoryId: string
 ): Promise<{ success: boolean; error?: string }> {
   try {
-    console.log('🔵 MEM0: Deleting memory:', memoryId);
+    console.log(' MEM0: Deleting memory:', memoryId);
 
     const client = getMem0Client();
     await client.delete(memoryId);
 
-    console.log('🟢 MEM0: Memory deleted successfully');
+    console.log(' MEM0: Memory deleted successfully');
 
     return { success: true };
   } catch (error: any) {
-    console.error('🔴 MEM0: Error deleting memory:', {
+    console.error(' MEM0: Error deleting memory:', {
       message: error.message,
       memoryId,
     });
@@ -282,7 +282,7 @@ export async function deleteAllMemories(
   userId: string
 ): Promise<{ success: boolean; deletedCount?: number; error?: string }> {
   try {
-    console.log('🔵 MEM0: Deleting all memories for user:', userId.substring(0, 8) + '...');
+    console.log(' MEM0: Deleting all memories for user:', userId.substring(0, 8) + '...');
 
     // First, get all memories
     const { success, memories, error } = await getAllMemories(userId);
@@ -300,18 +300,18 @@ export async function deleteAllMemories(
         await client.delete(memory.id);
         deletedCount++;
       } catch (err) {
-        console.warn('⚠️ MEM0: Failed to delete memory:', memory.id);
+        console.warn('️ MEM0: Failed to delete memory:', memory.id);
       }
     }
 
-    console.log('🟢 MEM0: Deleted', deletedCount, 'memories');
+    console.log(' MEM0: Deleted', deletedCount, 'memories');
 
     return {
       success: true,
       deletedCount,
     };
   } catch (error: any) {
-    console.error('🔴 MEM0: Error deleting all memories:', {
+    console.error(' MEM0: Error deleting all memories:', {
       message: error.message,
       userId: userId.substring(0, 8) + '...',
     });

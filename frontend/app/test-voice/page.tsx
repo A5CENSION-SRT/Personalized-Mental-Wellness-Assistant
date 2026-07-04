@@ -105,7 +105,7 @@ export default function VoiceTestPage() {
           {!isSupported && (
             <div className="bg-yellow-500/10 border border-yellow-500/50 rounded-2xl p-4">
               <p className="text-sm text-yellow-700 dark:text-yellow-300">
-                ⚠️ Speech recognition not supported in this browser. Use Chrome or Edge.
+                ️ Speech recognition not supported in this browser. Use Chrome or Edge.
               </p>
             </div>
           )}
@@ -124,7 +124,7 @@ export default function VoiceTestPage() {
               )}
             >
               <Mic className="w-8 h-8 mx-auto mb-2" />
-              {isListening ? "🎤 Listening... (Click to stop)" : "Start Voice Input"}
+              {isListening ? " Listening... (Click to stop)" : "Start Voice Input"}
               {isListening && (
                 <span className="absolute top-4 right-4 w-4 h-4 bg-green-300 rounded-full animate-ping"></span>
               )}
@@ -239,7 +239,7 @@ export default function VoiceTestPage() {
             {audioUrl && !error && !loading && (
               <div className="bg-green-500/10 border border-green-500/50 rounded-2xl p-4">
                 <p className="text-sm text-green-700 dark:text-green-300">
-                  ✅ Audio generated and played successfully!
+                   Audio generated and played successfully!
                 </p>
               </div>
             )}
@@ -266,7 +266,7 @@ export default function VoiceTestPage() {
 
         {/* Integration Test */}
         <div className="glass rounded-3xl p-8 border-2 border-border space-y-4">
-          <h2 className="text-2xl font-semibold">🎯 Full Integration Test</h2>
+          <h2 className="text-2xl font-semibold"> Full Integration Test</h2>
           <ol className="space-y-3 text-sm">
             <li className="flex gap-3">
               <span className="font-bold text-primary">1.</span>
@@ -287,14 +287,14 @@ export default function VoiceTestPage() {
           </ol>
           <div className="bg-blue-500/10 border border-blue-500/50 rounded-2xl p-4 mt-4">
             <p className="text-sm text-blue-700 dark:text-blue-300">
-              💡 <strong>Tip:</strong> This test page works independently of the chat backend, perfect for testing when rate-limited!
+               <strong>Tip:</strong> This test page works independently of the chat backend, perfect for testing when rate-limited!
             </p>
           </div>
         </div>
 
         {/* Status Info */}
         <div className="text-center text-xs text-muted-foreground space-y-1">
-          <p>Voice Input: {isSupported ? '✅ Supported' : '❌ Not supported'}</p>
+          <p>Voice Input: {isSupported ? ' Supported' : ' Not supported'}</p>
           <p>TTS Service: Google Cloud Text-to-Speech</p>
         </div>
       </div>

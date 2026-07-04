@@ -15,7 +15,7 @@ export async function deleteFromPinecone(documentId: string): Promise<void> {
       }
     });
 
-    console.log(`✅ Deleted all vectors for document: ${documentId}`);
+    console.log(` Deleted all vectors for document: ${documentId}`);
   } catch (error: any) {
     console.error('Error deleting from Pinecone:', error);
     throw new Error(`Failed to delete vectors from Pinecone: ${error.message}`);
@@ -32,7 +32,7 @@ export async function deleteVectorsByIds(vectorIds: string[]): Promise<void> {
     
     await index.deleteMany(vectorIds);
 
-    console.log(`✅ Deleted ${vectorIds.length} vectors from Pinecone`);
+    console.log(` Deleted ${vectorIds.length} vectors from Pinecone`);
   } catch (error: any) {
     console.error('Error deleting vectors by IDs:', error);
     throw new Error(`Failed to delete vectors: ${error.message}`);
@@ -48,7 +48,7 @@ export async function deleteAllVectors(): Promise<void> {
     
     await index.deleteAll();
 
-    console.log('✅ Deleted all vectors from Pinecone index');
+    console.log(' Deleted all vectors from Pinecone index');
   } catch (error: any) {
     console.error('Error deleting all vectors:', error);
     throw new Error(`Failed to delete all vectors: ${error.message}`);

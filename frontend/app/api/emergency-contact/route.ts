@@ -19,12 +19,12 @@ function createNoCacheResponse(data: any, status = 200) {
 // GET - Get emergency contact
 export async function GET(request: NextRequest) {
   console.log('\n========================================');
-  console.log('🔵 GET /api/emergency-contact');
+  console.log(' GET /api/emergency-contact');
   console.log('========================================');
   
   try {
     const supabase = await createClient();
-    console.log('✅ Supabase client created');
+    console.log(' Supabase client created');
     
     const { data: { user }, error: authError } = await supabase.auth.getUser();
     
@@ -36,14 +36,14 @@ export async function GET(request: NextRequest) {
     });
     
     if (authError || !user) {
-      console.log('❌ No authenticated user');
+      console.log(' No authenticated user');
       return createNoCacheResponse({ 
         success: false,
         error: 'Unauthorized' 
       }, 401);
     }
 
-    console.log('🔵 Querying user_profiles for user_id:', user.id);
+    console.log(' Querying user_profiles for user_id:', user.id);
     
     const { data: profile, error: profileError } = await supabase
       .from('user_profiles')
@@ -59,10 +59,10 @@ export async function GET(request: NextRequest) {
     });
 
     if (profileError) {
-      console.log('❌ Profile query error:', profileError);
+      console.log(' Profile query error:', profileError);
       
       if (profileError.code === 'PGRST116') {
-        console.log('⚠️ Profile not found, returning empty');
+        console.log('️ Profile not found, returning empty');
         return createNoCacheResponse({
           success: true,
           emergencyContactEmail: null,
@@ -80,7 +80,7 @@ export async function GET(request: NextRequest) {
     const email = profile?.emergency_contact_email;
     const linked = email !== null && email !== undefined && email !== '';
 
-    console.log('✅ Returning:', {
+    console.log(' Returning:', {
       emergencyContactEmail: email,
       isLinked: linked,
       profileFound: !!profile
@@ -93,7 +93,7 @@ export async function GET(request: NextRequest) {
       isLinked: linked,
     });
   } catch (error: any) {
-    console.error('❌ Unexpected error:', error);
+    console.error(' Unexpected error:', error);
     console.error('Stack:', error.stack);
     return createNoCacheResponse(
       { 

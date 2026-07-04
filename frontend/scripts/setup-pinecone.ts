@@ -6,12 +6,12 @@
 import { Pinecone } from '@pinecone-database/pinecone';
 
 async function setupPinecone() {
-  console.log('🔵 Setting up Pinecone index...\n');
+  console.log(' Setting up Pinecone index...\n');
 
   const apiKey = process.env.PINECONE_API_KEY;
   
   if (!apiKey) {
-    console.error('❌ PINECONE_API_KEY not found in environment');
+    console.error(' PINECONE_API_KEY not found in environment');
     process.exit(1);
   }
 
@@ -21,10 +21,10 @@ async function setupPinecone() {
 
   try {
     // Check existing indexes
-    console.log('🔍 Checking existing indexes...');
+    console.log(' Checking existing indexes...');
     const indexes = await pinecone.listIndexes();
     
-    console.log(`📋 Found ${indexes.indexes?.length || 0} existing indexes:`);
+    console.log(` Found ${indexes.indexes?.length || 0} existing indexes:`);
     indexes.indexes?.forEach(idx => {
       console.log(`   - ${idx.name} (${idx.dimension} dimensions, ${idx.metric} metric)`);
     });
@@ -33,13 +33,13 @@ async function setupPinecone() {
     const existingIndex = indexes.indexes?.find(idx => idx.name === indexName);
     
     if (existingIndex) {
-      console.log(`\n✅ Index "${indexName}" already exists!`);
+      console.log(`\n Index "${indexName}" already exists!`);
       console.log(`   Dimensions: ${existingIndex.dimension}`);
       console.log(`   Metric: ${existingIndex.metric}`);
       console.log(`   Status: ${existingIndex.status?.ready ? 'Ready' : 'Not Ready'}`);
       
       if (existingIndex.dimension !== 768) {
-        console.log(`\n⚠️  WARNING: Index has ${existingIndex.dimension} dimensions, but text-embedding-004 needs 768!`);
+        console.log(`\n️  WARNING: Index has ${existingIndex.dimension} dimensions, but text-embedding-004 needs 768!`);
         console.log(`   You need to delete and recreate the index with correct dimensions.`);
       }
       
@@ -47,7 +47,7 @@ async function setupPinecone() {
     }
 
     // Create new index
-    console.log(`\n📦 Creating index "${indexName}"...`);
+    console.log(`\n Creating index "${indexName}"...`);
     console.log('   Settings:');
     console.log('   - Dimensions: 768 (text-embedding-004)');
     console.log('   - Metric: cosine');
@@ -66,8 +66,8 @@ async function setupPinecone() {
       }
     });
 
-    console.log(`\n✅ Index "${indexName}" created successfully!`);
-    console.log(`\n⏳ Waiting for index to be ready (this may take 1-2 minutes)...`);
+    console.log(`\n Index "${indexName}" created successfully!`);
+    console.log(`\n Waiting for index to be ready (this may take 1-2 minutes)...`);
 
     // Wait for index to be ready
     let ready = false;
@@ -92,16 +92,16 @@ async function setupPinecone() {
     }
 
     if (ready) {
-      console.log(`\n🎉 Index "${indexName}" is ready to use!`);
+      console.log(`\n Index "${indexName}" is ready to use!`);
     } else {
-      console.log(`\n⚠️  Index created but not ready yet. Please check Pinecone console.`);
+      console.log(`\n️  Index created but not ready yet. Please check Pinecone console.`);
     }
 
   } catch (error: any) {
-    console.error('\n❌ Error:', error.message);
+    console.error('\n Error:', error.message);
     
     if (error.message?.includes('already exists')) {
-      console.log('\n✅ Index already exists! You are good to go.');
+      console.log('\n Index already exists! You are good to go.');
     } else {
       console.error('\nFull error:', error);
       process.exit(1);

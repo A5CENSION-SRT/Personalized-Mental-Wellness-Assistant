@@ -1,0 +1,40 @@
+flowchart TD
+    subgraph OAuth["OAuth 2.0 PKCE Authorization Flow"]
+        Connect[User Clicks Connect Fitbit]:::frontend --> AuthRoute["/api/fitbit/authorize"]:::api
+        AuthRoute --> FitbitConsent[Fitbit OAuth Consent Screen]:::external
+        FitbitConsent --> CallbackRoute["/api/fitbit/callback"]:::api
+        CallbackRoute --> ExchangeToken[Exchange Code for Access & Refresh Tokens]:::agent
+        ExchangeToken --> StoreTokens[("Store Tokens in fitbit_tokens DB")]:::database
+    end
+
+    subgraph Sync["Background Sync & Historical Retrieval"]
+        StoreTokens --> HistoricalRoute["/api/fitbit/data"]:::api
+        HistoricalRoute --> ParallelFetch{Fetch 7-Day Metrics}:::agent
+        
+        ParallelFetch --> Sleep["GET /sleep/date/{date}.json"]:::external
+        ParallelFetch --> HR["GET /activities/heart/date/{date}/7d.json"]:::external
+        ParallelFetch --> Activity["GET /activities/date/{date}.json"]:::external
+        ParallelFetch --> HRV["GET /hrv/date/{date}.json"]:::external
+        
+        Sleep & HR & Activity & HRV --> StoreFitbitDB[("Persist Records in fitbit_data DB")]:::database
+    end
+
+    subgraph Intraday["Real-Time Intraday Vitals Pipeline"]
+        ChatMessage[User Sends Chat Prompt]:::user --> IntradayRoute["/api/fitbit/intraday/wellness"]:::api
+        IntradayRoute --> Fetch30Min{Fetch Last 30-Min Intraday}:::agent
+        
+        Fetch30Min --> IntraHR["Intraday HR (1-min granular)"]:::external
+        Fetch30Min --> IntraHRV["Intraday HRV (RMSSD)"]:::external
+        Fetch30Min --> IntraBreath["Breathing Rate"]:::external
+        Fetch30Min --> IntraSpO2["SpO2 Blood Oxygen"]:::external
+        
+        IntraHR & IntraHRV & IntraBreath & IntraSpO2 --> CalcIndicators[Calculate Stress & Fatigue Indicators]:::agent
+        CalcIndicators --> PromptContext[Inject Vitals Context into Summarizer]:::frontend
+    end
+
+    classDef user fill:#f3f4f6,stroke:#6b7280,stroke-width:1.5px,color:#111827;
+    classDef frontend fill:#dbeafe,stroke:#3b82f6,stroke-width:1.5px,color:#1e3a8a;
+    classDef api fill:#f3e8ff,stroke:#a855f7,stroke-width:1.5px,color:#581c87;
+    classDef agent fill:#fef3c7,stroke:#f59e0b,stroke-width:1.5px,color:#78350f;
+    classDef database fill:#dcfce7,stroke:#22c55e,stroke-width:1.5px,color:#14532d;
+    classDef external fill:#ffe4e6,stroke:#f43f5e,stroke-width:1.5px,color:#881337;

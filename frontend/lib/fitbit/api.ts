@@ -242,7 +242,7 @@ export async function getSimplifiedSleepData(
 
 // Fetch all daily data at once
 export async function fetchAllDailyData(userId: string, date: string = 'today') {
-  console.log('🔵 API: Fetching all daily data for date:', date);
+  console.log(' API: Fetching all daily data for date:', date);
 
   const [activity, heartRate, sleep, profile] = await Promise.allSettled([
     getSimplifiedActivityData(userId, date),
@@ -251,7 +251,7 @@ export async function fetchAllDailyData(userId: string, date: string = 'today') 
     fetchProfile(userId),
   ]);
 
-  console.log('🔵 API: Raw results from Fitbit:', {
+  console.log(' API: Raw results from Fitbit:', {
     activity: {
       status: activity.status,
       data: activity.status === 'fulfilled' ? activity.value : activity.reason?.message,
@@ -278,7 +278,7 @@ export async function fetchAllDailyData(userId: string, date: string = 'today') 
     date,
   };
 
-  console.log('🟢 API: Final processed data:', JSON.stringify(result, null, 2));
+  console.log(' API: Final processed data:', JSON.stringify(result, null, 2));
 
   return result;
 }

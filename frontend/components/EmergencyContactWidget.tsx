@@ -14,17 +14,17 @@ export default function EmergencyContactWidget() {
   const [success, setSuccess] = useState('');
 
   useEffect(() => {
-    console.log('🔵 WIDGET: Component mounted, calling fetchEmergencyContact');
+    console.log(' WIDGET: Component mounted, calling fetchEmergencyContact');
     fetchEmergencyContact();
   }, []);
 
   const fetchEmergencyContact = async () => {
     try {
-      console.log('🔵 WIDGET: Starting fetch...');
+      console.log(' WIDGET: Starting fetch...');
       setLoading(true);
       setError('');
       
-      console.log('🔵 WIDGET: Making GET request to /api/emergency-contact');
+      console.log(' WIDGET: Making GET request to /api/emergency-contact');
       const response = await fetch(`/api/emergency-contact?t=${Date.now()}`, {
         method: 'GET',
         headers: {
@@ -33,28 +33,28 @@ export default function EmergencyContactWidget() {
         cache: 'no-store',
       });
       
-      console.log('🔵 WIDGET: Response received, status:', response.status);
+      console.log(' WIDGET: Response received, status:', response.status);
       
       if (!response.ok) {
         throw new Error('Failed to fetch emergency contact');
       }
       
       const data = await response.json();
-      console.log('🔵 WIDGET: Response data:', data);
+      console.log(' WIDGET: Response data:', data);
       
       if (data.success) {
-        console.log('✅ WIDGET: Setting state - email:', data.emergencyContactEmail, 'linked:', data.isLinked);
+        console.log(' WIDGET: Setting state - email:', data.emergencyContactEmail, 'linked:', data.isLinked);
         setEmergencyContact(data.emergencyContactEmail);
         setIsLinked(data.isLinked);
         setEmailInput(data.emergencyContactEmail || '');
       } else {
-        console.log('❌ WIDGET: Response success=false');
+        console.log(' WIDGET: Response success=false');
       }
     } catch (err: any) {
-      console.error('❌ WIDGET: Error:', err);
+      console.error(' WIDGET: Error:', err);
       setError('Failed to load emergency contact');
     } finally {
-      console.log('🔵 WIDGET: Setting loading=false');
+      console.log(' WIDGET: Setting loading=false');
       setLoading(false);
     }
   };
@@ -127,7 +127,7 @@ export default function EmergencyContactWidget() {
     }
   };
 
-  console.log('🔵 WIDGET: Rendering - loading:', loading, 'isLinked:', isLinked, 'email:', emergencyContact);
+  console.log(' WIDGET: Rendering - loading:', loading, 'isLinked:', isLinked, 'email:', emergencyContact);
 
   if (loading) {
     return (

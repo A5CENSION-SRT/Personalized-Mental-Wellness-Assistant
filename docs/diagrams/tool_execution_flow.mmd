@@ -1,0 +1,36 @@
+sequenceDiagram
+    autonumber
+    actor User as User (Client UI)
+    participant ChatAPI as Chat API (/api/chat)
+    participant Crisis as Safety Scanner
+    participant Orchestrator as Gemini Orchestrator
+    participant Tools as Tool Execution Engine
+    participant Summarizer as Context Summarizer
+    participant DeepSeek as DeepSeek Engine
+    participant DataStores as Supabase & Mem0
+
+    User->>ChatAPI: Send message prompt
+    ChatAPI->>Crisis: Scan for self-harm / crisis terms
+    
+    alt Severe Crisis Triggered
+        Crisis-->>ChatAPI: High-Severity Risk Flagged
+        ChatAPI->>DataStores: Dispatch Emergency Alert Email via Resend
+        ChatAPI-->>User: Render Hotline Resources (988) & Halt Session
+    else Safe / Standard Query
+        ChatAPI->>Orchestrator: Pass user message & chat history
+        
+        par Parallel Tool Execution (~2s total)
+            Orchestrator->>Tools: 1. searchMemories(query) [Mem0 Vector DB]
+            Orchestrator->>Tools: 2. getUserProfile() [Supabase DB]
+            Orchestrator->>Tools: 3. getFitbitHealthData() [7-Day Vitals]
+            Orchestrator->>Tools: 4. getRecentWellness() [Intraday Vitals]
+            Orchestrator->>Tools: 5. shouldCallRAG() -> queryRAG() [Pinecone DB]
+        end
+        
+        Tools-->>Summarizer: Return raw multi-source context (~3,000 tokens)
+        Summarizer->>Summarizer: Compress to natural language paragraph (~60 tokens)
+        Summarizer-->>DeepSeek: Forward compressed summary + dialogue history
+        DeepSeek-->>ChatAPI: Generate empathetic response (<100 words)
+        ChatAPI->>DataStores: Save chat turn & store health insights in Mem0
+        ChatAPI-->>User: Return response with embedded vitals context
+    end

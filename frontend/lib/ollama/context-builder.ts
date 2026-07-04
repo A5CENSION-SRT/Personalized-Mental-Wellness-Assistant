@@ -114,7 +114,7 @@ export function buildContextForDeepSeek(
 
     // Format AI health analysis
     if (context.healthAnalysis) {
-        let analysisText = '## 🤖 AI Health Analysis:\n';
+        let analysisText = '##  AI Health Analysis:\n';
         analysisText += `**Summary:** ${context.healthAnalysis.summary}\n`;
         analysisText += `**Mental Health Impact:** ${context.healthAnalysis.mentalHealthCorrelation}\n`;
         analysisText += `**Urgency Level:** ${context.healthAnalysis.urgencyLevel.toUpperCase()}\n`;
@@ -164,12 +164,12 @@ export function buildDeepSeekPrompt(
     let contextText = '';
     if (summarizedContext?.summarizedContext) {
         contextText = summarizedContext.summarizedContext;
-        console.log('✅ Using Flash summarized context');
+        console.log(' Using Flash summarized context');
     } else {
         // Fallback: mini summary
         contextText = `User has ${context.memories.length} memories.`;
         if (context.fitbitData) contextText += ' Health data available.';
-        console.log('⚠️ Using fallback context (no Flash summary)');
+        console.log('️ Using fallback context (no Flash summary)');
     }
 
     console.log('Final context text length:', contextText.length);

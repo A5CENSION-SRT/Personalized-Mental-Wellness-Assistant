@@ -40,7 +40,7 @@ export async function analyzeHealthDataWithAI(
     // Check if Ollama is running
     const isHealthy = await checkOllamaHealth();
     if (!isHealthy) {
-      console.warn('⚠️ FITBIT AI: Ollama service not available, skipping AI analysis');
+      console.warn('️ FITBIT AI: Ollama service not available, skipping AI analysis');
       return null;
     }
 
@@ -223,7 +223,7 @@ export function formatAIInsightsForMemory(insights: AIHealthInsight, dateRange: 
  * Format AI insights for display in chat
  */
 export function formatAIInsightsForChat(insights: AIHealthInsight): string {
-  let formatted = '### 📊 Your Health Analysis\n\n';
+  let formatted = '###  Your Health Analysis\n\n';
   formatted += `${insights.summary}\n\n`;
 
   if (insights.mentalHealthCorrelation) {

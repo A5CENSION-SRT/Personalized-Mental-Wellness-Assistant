@@ -105,7 +105,7 @@ export function detectCrisis(message: string): boolean {
 export function getSevereEmergencyResourcesText(): string {
   const resources = EMERGENCY_RESOURCES.india;
   
-  let text = `🚨 **EMERGENCY - PLEASE SEEK IMMEDIATE HELP** 🚨\n\n`;
+  let text = ` **EMERGENCY - PLEASE SEEK IMMEDIATE HELP** \n\n`;
   text += `I'm deeply concerned about what you've shared. **This chat cannot provide the urgent support you need right now.**\n\n`;
   text += `**Please contact one of these resources IMMEDIATELY:**\n\n`;
   
@@ -137,7 +137,7 @@ export function getSevereEmergencyResourcesText(): string {
 export function getEmergencyResourcesText(): string {
   const resources = EMERGENCY_RESOURCES.india;
   
-  let text = `\n\n🚨 **IMMEDIATE HELP AVAILABLE** 🚨\n\n`;
+  let text = `\n\n **IMMEDIATE HELP AVAILABLE** \n\n`;
   text += `I'm concerned about your safety. Please reach out to one of these resources right now:\n\n`;
   
   text += `**24/7 Crisis Hotlines:**\n`;
@@ -165,7 +165,7 @@ export function getEmergencyResourcesText(): string {
  * @returns Prompt text to add for crisis situations
  */
 export function getCrisisPromptAddition(): string {
-  return `\n\n⚠️ **CRITICAL SAFETY ALERT**: The student's message contains indicators of potential self-harm or suicidal ideation.
+  return `\n\n️ **CRITICAL SAFETY ALERT**: The student's message contains indicators of potential self-harm or suicidal ideation.
 
 **YOU MUST:**
 1. Express immediate concern and empathy

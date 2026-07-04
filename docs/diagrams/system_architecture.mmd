@@ -1,0 +1,62 @@
+graph TB
+    subgraph Frontend["Frontend Layer (Next.js 14 App Router)"]
+        UI["Chat Interface & Dashboard<br/>(dashboard/page.tsx)"]:::frontend
+        FitbitWidget["Fitbit Health Widget<br/>(FitbitWidget.tsx)"]:::frontend
+        AdminUI["Admin Document Panel<br/>(admin/page.tsx)"]:::frontend
+    end
+    
+    subgraph API["API Gateway Layer"]
+        ChatAPI["Chat API Endpoint<br/>(/api/chat)"]:::api
+        FitbitAPI["Fitbit Integration APIs<br/>(/api/fitbit/*)"]:::api
+        AdminAPI["Admin RAG APIs<br/>(/api/admin/documents)"]:::api
+        EmergencyAPI["Emergency Contact API<br/>(/api/emergency-contact)"]:::api
+    end
+    
+    subgraph Orchestration["Multi-Agent AI Engine"]
+        CrisisDetect["Crisis & Safety Scanner"]:::agent
+        FlashOrchestrator["Gemini 2.5 Flash Orchestrator<br/>(Parallel Tool Dispatcher)"]:::agent
+        FlashSummarizer["Gemini 2.5 Flash Summarizer<br/>(Context Compressor)"]:::agent
+        DeepSeek["DeepSeek via Ollama<br/>(Empathetic Response Generator)"]:::agent
+    end
+    
+    subgraph Tools["Tool & Context Integrations"]
+        Mem0["Mem0 AI Vector Store<br/>(searchMemories)"]:::external
+        FitbitClient["Fitbit Intraday & Vitals API<br/>(getRecentWellness)"]:::external
+        RAGSystem["Pinecone + Nomic RAG<br/>(queryRAG)"]:::external
+        UserProfile["User Profile DB Handler<br/>(getUserProfile)"]:::external
+    end
+    
+    subgraph Data["Data Stores"]
+        DB[("PostgreSQL Database<br/>(Supabase DB)")]:::database
+        VectorDB[("Pinecone Vector DB<br/>(RAG Embeddings)")]:::database
+        Storage[("Supabase Storage<br/>(Document PDFs)")]:::database
+    end
+    
+    UI -->|HTTP POST Prompt| ChatAPI
+    FitbitWidget -->|Fetch Vitals| FitbitAPI
+    AdminUI -->|Upload PDF| AdminAPI
+    
+    ChatAPI --> CrisisDetect
+    CrisisDetect -->|Severe Crisis Flag| EmergencyAPI
+    CrisisDetect -->|Safe Query| FlashOrchestrator
+    
+    FlashOrchestrator -->|Parallel Query| Mem0
+    FlashOrchestrator -->|Parallel Query| FitbitClient
+    FlashOrchestrator -->|Conditional Query| RAGSystem
+    FlashOrchestrator -->|Parallel Query| UserProfile
+    
+    Mem0 & FitbitClient & RAGSystem & UserProfile --> FlashSummarizer
+    FlashSummarizer -->|Compressed Context| DeepSeek
+    DeepSeek -->|Streams Response| ChatAPI
+    ChatAPI -->|Renders Response| UI
+    
+    FitbitAPI --> DB
+    Mem0 --> VectorDB
+    RAGSystem --> VectorDB
+    AdminAPI --> Storage
+
+    classDef frontend fill:#dbeafe,stroke:#3b82f6,stroke-width:1.5px,color:#1e3a8a;
+    classDef api fill:#f3e8ff,stroke:#a855f7,stroke-width:1.5px,color:#581c87;
+    classDef agent fill:#fef3c7,stroke:#f59e0b,stroke-width:1.5px,color:#78350f;
+    classDef database fill:#dcfce7,stroke:#22c55e,stroke-width:1.5px,color:#14532d;
+    classDef external fill:#ffe4e6,stroke:#f43f5e,stroke-width:1.5px,color:#881337;

@@ -79,7 +79,7 @@ export async function storeInPinecone(
   try {
     const index = await getPineconeClient();
 
-    console.log(`📊 Storing ${chunks.length} chunks for document: ${filename}`);
+    console.log(` Storing ${chunks.length} chunks for document: ${filename}`);
 
     // Process chunks in batches to avoid rate limits
     const batchSize = 100;
@@ -89,14 +89,14 @@ export async function storeInPinecone(
       batches.push(chunks.slice(i, i + batchSize));
     }
 
-    console.log(`📦 Processing ${batches.length} batches (${batchSize} chunks per batch)`);
+    console.log(` Processing ${batches.length} batches (${batchSize} chunks per batch)`);
 
     let totalStored = 0;
 
     for (let batchIndex = 0; batchIndex < batches.length; batchIndex++) {
       const batch = batches[batchIndex];
 
-      console.log(`⚙️ Processing batch ${batchIndex + 1}/${batches.length} (${batch.length} chunks)...`);
+      console.log(`️ Processing batch ${batchIndex + 1}/${batches.length} (${batch.length} chunks)...`);
 
       // Generate embeddings for all chunks in batch
       const vectors: VectorRecord[] = [];
@@ -137,7 +137,7 @@ export async function storeInPinecone(
             await new Promise(resolve => setTimeout(resolve, 100));
           }
         } catch (error: any) {
-          console.error(`❌ Error processing chunk ${globalIndex}:`, error.message);
+          console.error(` Error processing chunk ${globalIndex}:`, error.message);
           // Continue with other chunks even if one fails
           continue;
         }
@@ -148,9 +148,9 @@ export async function storeInPinecone(
         try {
           await index.upsert(vectors);
           totalStored += vectors.length;
-          console.log(`✅ Batch ${batchIndex + 1} stored: ${vectors.length} vectors`);
+          console.log(` Batch ${batchIndex + 1} stored: ${vectors.length} vectors`);
         } catch (upsertError: any) {
-          console.error(`❌ Failed to upsert batch ${batchIndex + 1}:`, upsertError.message);
+          console.error(` Failed to upsert batch ${batchIndex + 1}:`, upsertError.message);
           throw upsertError;
         }
       }
@@ -161,14 +161,14 @@ export async function storeInPinecone(
       }
     }
 
-    console.log(`✅ Successfully stored ${totalStored}/${chunks.length} vectors in Pinecone`);
+    console.log(` Successfully stored ${totalStored}/${chunks.length} vectors in Pinecone`);
 
     if (totalStored < chunks.length) {
-      console.warn(`⚠️ Warning: Only ${totalStored} out of ${chunks.length} chunks were stored`);
+      console.warn(`️ Warning: Only ${totalStored} out of ${chunks.length} chunks were stored`);
     }
 
   } catch (error: any) {
-    console.error('❌ Error storing in Pinecone:', error);
+    console.error(' Error storing in Pinecone:', error);
     throw new Error(`Failed to store vectors in Pinecone: ${error.message}`);
   }
 }
@@ -212,9 +212,9 @@ export async function storeSingleChunk(
     // Upsert to Pinecone
     await index.upsert([vector]);
 
-    console.log(`✅ Stored single chunk: ${vectorId}`);
+    console.log(` Stored single chunk: ${vectorId}`);
   } catch (error: any) {
-    console.error('❌ Error storing single chunk:', error);
+    console.error(' Error storing single chunk:', error);
     throw new Error(`Failed to store chunk in Pinecone: ${error.message}`);
   }
 }
@@ -240,14 +240,14 @@ export async function updateDocumentVectors(
       }
     });
 
-    console.log(`🗑️ Deleted existing vectors for document: ${documentId}`);
+    console.log(`️ Deleted existing vectors for document: ${documentId}`);
 
     // Then store new vectors
     await storeInPinecone(chunks, documentId, filename);
 
-    console.log(`✅ Updated vectors for document: ${documentId}`);
+    console.log(` Updated vectors for document: ${documentId}`);
   } catch (error: any) {
-    console.error('❌ Error updating document vectors:', error);
+    console.error(' Error updating document vectors:', error);
     throw new Error(`Failed to update vectors: ${error.message}`);
   }
 }

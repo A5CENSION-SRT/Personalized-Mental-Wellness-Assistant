@@ -492,7 +492,7 @@ export default function AdminPage() {
 
                           {meta.processingTime && (
                             <div className="mt-3 p-2 glass rounded-xl text-xs text-muted-foreground">
-                              ⚡ Processing time: {meta.processingTime.toFixed(2)}s
+                               Processing time: {meta.processingTime.toFixed(2)}s
                             </div>
                           )}
                         </div>

@@ -34,7 +34,7 @@ export async function DELETE(
       return NextResponse.json({ error: 'Document ID is required' }, { status: 400 });
     }
 
-    console.log(`🗑️ Deleting document: ${documentId}`);
+    console.log(`️ Deleting document: ${documentId}`);
 
     // First, get the document to verify it exists
     const { data: document, error: fetchError } = await supabase
@@ -48,35 +48,35 @@ export async function DELETE(
       return NextResponse.json({ error: 'Document not found' }, { status: 404 });
     }
 
-    console.log(`📄 Found document: ${document.filename}`);
+    console.log(` Found document: ${document.filename}`);
 
     // Delete vectors from Pinecone
     try {
-      console.log('🗑️ Deleting vectors from Pinecone...');
+      console.log('️ Deleting vectors from Pinecone...');
       await deleteFromPinecone(documentId);
-      console.log('✅ Vectors deleted from Pinecone');
+      console.log(' Vectors deleted from Pinecone');
     } catch (pineconeError: any) {
-      console.error('⚠️ Failed to delete from Pinecone:', pineconeError);
+      console.error('️ Failed to delete from Pinecone:', pineconeError);
       // Continue with database deletion even if Pinecone fails
       // You might want to log this for manual cleanup
     }
 
     // Delete from Supabase
-    console.log('🗑️ Deleting from database...');
+    console.log('️ Deleting from database...');
     const { error: deleteError } = await supabase
       .from('admin_documents')
       .delete()
       .eq('id', documentId);
 
     if (deleteError) {
-      console.error('❌ Database deletion error:', deleteError);
+      console.error(' Database deletion error:', deleteError);
       return NextResponse.json({ 
         error: 'Failed to delete document from database',
         details: deleteError.message 
       }, { status: 500 });
     }
 
-    console.log('✅ Document deleted successfully');
+    console.log(' Document deleted successfully');
 
     return NextResponse.json({
       success: true,
@@ -85,7 +85,7 @@ export async function DELETE(
     });
 
   } catch (error: any) {
-    console.error('❌ Delete error:', error);
+    console.error(' Delete error:', error);
     return NextResponse.json(
       { 
         error: 'Failed to delete document',

@@ -1,0 +1,19 @@
+flowchart TD
+    Input([Incoming User Message]):::user --> Scan{Scan Crisis Keywords}:::agent
+    
+    Scan -->|Self-Harm / Suicidal Intent| Severe[Severe Crisis Triggered]:::external
+    Scan -->|General Distress / Safe| Mild[Mild / Standard Conversation]:::frontend
+    
+    Severe --> Action1[Trigger Emergency Response UI Modal]:::frontend
+    Severe --> Action2[Send Alert Email to Emergency Contact via Resend]:::api
+    Severe --> Action3[Display 988 Suicide & Crisis Lifeline Information]:::user
+    Severe --> Action4[Halt LLM Generation & Disable Input]:::external
+    
+    Mild --> LLM[Proceed to Multi-Agent Orchestration Pipeline]:::agent
+
+    classDef user fill:#f3f4f6,stroke:#6b7280,stroke-width:1.5px,color:#111827;
+    classDef frontend fill:#dbeafe,stroke:#3b82f6,stroke-width:1.5px,color:#1e3a8a;
+    classDef api fill:#f3e8ff,stroke:#a855f7,stroke-width:1.5px,color:#581c87;
+    classDef agent fill:#fef3c7,stroke:#f59e0b,stroke-width:1.5px,color:#78350f;
+    classDef database fill:#dcfce7,stroke:#22c55e,stroke-width:1.5px,color:#14532d;
+    classDef external fill:#ffe4e6,stroke:#f43f5e,stroke-width:1.5px,color:#881337;

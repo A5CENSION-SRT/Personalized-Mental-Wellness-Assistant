@@ -68,17 +68,17 @@ ONLY skip queryRAG for:
 2. Brief acknowledgments ("Thanks", "OK", "Got it")
 3. Very specific metric queries ("How many steps exactly?", "What was my heart rate at 3pm?")
 
-When in doubt → CALL queryRAG. It's better to have too much context than too little.
+When in doubt  CALL queryRAG. It's better to have too much context than too little.
 
 Examples:
-- "I'm feeling down" → queryRAG ✅
-- "My health is affecting my mood" → queryRAG ✅  
-- "How is my health data?" → queryRAG ✅ (needs interpretation)
-- "Tell me about my wellness" → queryRAG ✅
-- "I'm struggling" → queryRAG ✅
-- "Having a tough day" → queryRAG ✅
-- "Hello" → NO tools ❌
-- "Thanks" → NO tools ❌`;
+- "I'm feeling down"  queryRAG 
+- "My health is affecting my mood"  queryRAG   
+- "How is my health data?"  queryRAG  (needs interpretation)
+- "Tell me about my wellness"  queryRAG 
+- "I'm struggling"  queryRAG 
+- "Having a tough day"  queryRAG 
+- "Hello"  NO tools 
+- "Thanks"  NO tools `;
 
 /**
  * Main orchestration function
@@ -96,10 +96,10 @@ export async function orchestrateContext(
 ): Promise<SummarizedOrchestratedContext> {
     const startTime = Date.now();
 
-    console.log('\n🔵━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
-    console.log('🔵 ORCHESTRATOR: Starting context orchestration');
+    console.log('\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
+    console.log(' ORCHESTRATOR: Starting context orchestration');
     console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
-    console.log('📝 User message:', userMessage.substring(0, 100));
+    console.log(' User message:', userMessage.substring(0, 100));
 
     const context: SummarizedOrchestratedContext = {
         memories: [],
@@ -118,7 +118,7 @@ export async function orchestrateContext(
         // ============================================================
         // PHASE 1: Parallel tool execution
         // ============================================================
-        console.log('🔄 ORCHESTRATOR: Starting parallel tool execution...');
+        console.log(' ORCHESTRATOR: Starting parallel tool execution...');
         const toolsStart = Date.now();
 
         const [memoriesResult, fitbitResult, recentWellnessResult, userProfileResult, ragDecision] = await Promise.allSettled([
@@ -134,7 +134,7 @@ export async function orchestrateContext(
             shouldCallRAG(userMessage, conversationHistory),
         ]);
 
-        console.log('✅ ORCHESTRATOR: Parallel tool execution completed in', Date.now() - toolsStart, 'ms');
+        console.log(' ORCHESTRATOR: Parallel tool execution completed in', Date.now() - toolsStart, 'ms');
 
         // Process memories result
         if (memoriesResult.status === 'fulfilled' && memoriesResult.value) {
@@ -194,7 +194,7 @@ export async function orchestrateContext(
         // ============================================================
         // PHASE 2: Summarize all context with Flash
         // ============================================================
-        console.log('🔄 ORCHESTRATOR: Starting Flash summarization...');
+        console.log(' ORCHESTRATOR: Starting Flash summarization...');
         const summaryStart = Date.now();
 
         const summaryResult = await summarizeContext(
@@ -205,7 +205,7 @@ export async function orchestrateContext(
             userProfile
         );
 
-        console.log('✅ ORCHESTRATOR: Flash summarization completed in', Date.now() - summaryStart, 'ms');
+        console.log(' ORCHESTRATOR: Flash summarization completed in', Date.now() - summaryStart, 'ms');
 
         context.summarizedContext = summaryResult.summary;
         context.keyPoints = summaryResult.keyPoints;
@@ -218,7 +218,7 @@ export async function orchestrateContext(
         return context;
 
     } catch (error: any) {
-        console.error('🔴 ORCHESTRATOR: Error during orchestration:', error.message);
+        console.error(' ORCHESTRATOR: Error during orchestration:', error.message);
         context.executionTimeMs = Date.now() - startTime;
         return context;
     }
@@ -262,7 +262,7 @@ async function shouldCallRAG(
             }],
         };
 
-        console.log('🔧 Tool Available: queryRAG');
+        console.log(' Tool Available: queryRAG');
 
         const requestStart = Date.now();
         const response = await client.models.generateContent({
@@ -281,10 +281,10 @@ async function shouldCallRAG(
         const duration = Date.now() - requestStart;
 
         console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
-        console.log('🤖 FLASH OUTPUT (RAG Decision):');
+        console.log(' FLASH OUTPUT (RAG Decision):');
         console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
-        console.log('⏱️  Response Time:', duration + 'ms');
-        console.log('📊 Candidates:', response.candidates?.length || 0);
+        console.log('️  Response Time:', duration + 'ms');
+        console.log(' Candidates:', response.candidates?.length || 0);
 
         // Check if Flash called the RAG tool
         let toolCalled = false;
@@ -295,24 +295,24 @@ async function shouldCallRAG(
                 if (part.functionCall?.name === 'queryRAG') {
                     toolCalled = true;
                     toolArgs = part.functionCall.args;
-                    console.log('✅ Tool Called: queryRAG');
-                    console.log('📦 Arguments:', JSON.stringify(toolArgs, null, 2));
+                    console.log(' Tool Called: queryRAG');
+                    console.log(' Arguments:', JSON.stringify(toolArgs, null, 2));
                 }
                 if (part.text) {
-                    console.log('💭 Flash Reasoning:', part.text);
+                    console.log(' Flash Reasoning:', part.text);
                 }
             }
         }
 
         if (!toolCalled) {
-            console.log('❌ No Tool Called - RAG not needed');
+            console.log(' No Tool Called - RAG not needed');
         }
         console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n');
 
         return toolCalled;
 
     } catch (error: any) {
-        console.error('🔴 ORCHESTRATOR: Flash RAG decision failed:', error.message);
+        console.error(' ORCHESTRATOR: Flash RAG decision failed:', error.message);
         // On error, default to NOT calling RAG (memories + Fitbit still work)
         return false;
     }
@@ -346,7 +346,7 @@ async function executeSearchMemories(
  */
 async function executeGetUserProfile(userId: string): Promise<any | null> {
     try {
-        console.log('🔵 TOOL: Executing getUserProfile...');
+        console.log(' TOOL: Executing getUserProfile...');
         const supabase = await createClient();
 
         const { data: profile, error } = await supabase
@@ -356,17 +356,17 @@ async function executeGetUserProfile(userId: string): Promise<any | null> {
             .single();
 
         if (error) {
-            console.warn('⚪ TOOL: getUserProfile failed:', error.message);
+            console.warn(' TOOL: getUserProfile failed:', error.message);
             return null;
         }
 
         if (profile) {
-            console.log('✅ TOOL: Got user profile:', profile.username);
+            console.log(' TOOL: Got user profile:', profile.username);
             return profile;
         }
         return null;
     } catch (error: any) {
-        console.warn('⚪ TOOL: getUserProfile error:', error.message);
+        console.warn(' TOOL: getUserProfile error:', error.message);
         return null;
     }
 }
@@ -393,7 +393,7 @@ async function executeFitbitFetch(
     args: { days?: number }
 ): Promise<OrchestratedContext['fitbitData'] | null> {
     try {
-        console.log('🔵 TOOL: Executing getFitbitHealthData...');
+        console.log(' TOOL: Executing getFitbitHealthData...');
         const supabase = await createClient();
 
         // Check if user has Fitbit connected
@@ -404,7 +404,7 @@ async function executeFitbitFetch(
             .single();
 
         if (!fitbitTokens) {
-            console.log('⚪ TOOL: User has no Fitbit connected');
+            console.log(' TOOL: User has no Fitbit connected');
             return null;
         }
 
@@ -418,11 +418,11 @@ async function executeFitbitFetch(
             .limit(days * 3); // 3 data types per day
 
         if (!recentData || recentData.length === 0) {
-            console.log('⚪ TOOL: No Fitbit data available');
+            console.log(' TOOL: No Fitbit data available');
             return null;
         }
 
-        console.log('🟢 TOOL: getFitbitHealthData returned', recentData.length, 'records');
+        console.log(' TOOL: getFitbitHealthData returned', recentData.length, 'records');
         return {
             connected: true,
             recentData: recentData.map(d => ({
@@ -432,7 +432,7 @@ async function executeFitbitFetch(
             })),
         };
     } catch (error: any) {
-        console.warn('⚠️ TOOL: getFitbitHealthData failed:', error.message);
+        console.warn('️ TOOL: getFitbitHealthData failed:', error.message);
         return null;
     }
 }
@@ -458,7 +458,7 @@ export async function orchestrateWithTimeout(
             timeoutPromise,
         ]);
     } catch (error: any) {
-        console.warn('⚠️ ORCHESTRATOR: Timeout or error, returning empty context');
+        console.warn('️ ORCHESTRATOR: Timeout or error, returning empty context');
         return {
             memories: [],
             ragChunks: [],
@@ -480,7 +480,7 @@ export async function orchestrateWithTimeout(
  */
 async function executeRecentWellnessFetch(userId: string): Promise<RecentWellnessData | null> {
     try {
-        console.log('🔵 TOOL: Fetching recent wellness data (intraday)...');
+        console.log(' TOOL: Fetching recent wellness data (intraday)...');
 
         const supabase = await createClient();
 
@@ -492,7 +492,7 @@ async function executeRecentWellnessFetch(userId: string): Promise<RecentWellnes
             .single();
 
         if (!fitbitTokens) {
-            console.log('⚪ TOOL: User has no Fitbit connected');
+            console.log(' TOOL: User has no Fitbit connected');
             return null;
         }
 
@@ -567,7 +567,7 @@ async function executeRecentWellnessFetch(userId: string): Promise<RecentWellnes
             mentalHealthIndicators,
         };
 
-        console.log('🟢 TOOL: Recent wellness fetched:', {
+        console.log(' TOOL: Recent wellness fetched:', {
             hasHeartRate: !!heartRate,
             hasHRV: !!hrv,
             stress: mentalHealthIndicators.stressLevel,
@@ -576,7 +576,7 @@ async function executeRecentWellnessFetch(userId: string): Promise<RecentWellnes
         return wellness;
 
     } catch (error: any) {
-        console.warn('⚠️ TOOL: Recent wellness fetch failed:', error.message);
+        console.warn('️ TOOL: Recent wellness fetch failed:', error.message);
         return null;
     }
 }

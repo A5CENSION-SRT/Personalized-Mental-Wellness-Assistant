@@ -36,9 +36,9 @@ GOOD EXAMPLE:
 "Sarah has been managing stress around upcoming exams and has been averaging 3,500 steps daily with 2,100 calories burned and a resting heart rate of 72 bpm. She mentioned feeling disconnected recently but is focused on scheduling activities that bring her joy. Her sleep has been averaging 6.5 hours with 83% efficiency."
 
 BAD EXAMPLES:
-❌ "## USER DATA: Sarah has..."
-❌ "- Name: Sarah\n- Steps: 3500"
-❌ "[VITAL SIGNS] Heart Rate: 72bpm"`;
+ "## USER DATA: Sarah has..."
+ "- Name: Sarah\n- Steps: 3500"
+ "[VITAL SIGNS] Heart Rate: 72bpm"`;
 
 /**
  * Summarize all tool outputs using Gemini Flash

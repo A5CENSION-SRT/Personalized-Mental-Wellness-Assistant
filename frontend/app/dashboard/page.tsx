@@ -128,12 +128,12 @@ function DashboardContent() {
       // Check if chat should be disabled due to severe crisis
       if (data.chatDisabled) {
         setChatDisabled(true);
-        console.log('🚨 CHAT DISABLED: Severe crisis detected');
+        console.log(' CHAT DISABLED: Severe crisis detected');
       }
 
       // Log if RAG context was used
       if (data.contextUsed && data.sources?.length > 0) {
-        console.log('📚 Used context from:', data.sources.map((s: any) => s.filename).join(', '));
+        console.log(' Used context from:', data.sources.map((s: any) => s.filename).join(', '));
       }
     } catch (error: any) {
       console.error('Error sending message:', error);
@@ -141,9 +141,9 @@ function DashboardContent() {
       let errorContent = "I apologize, but I'm having trouble responding right now.";
 
       if (error.message?.includes('API key')) {
-        errorContent = "⚠️ The AI service is not properly configured. Please contact support or check the console for details.";
+        errorContent = "️ The AI service is not properly configured. Please contact support or check the console for details.";
       } else if (error.message?.includes('rate limit')) {
-        errorContent = "⚠️ I'm receiving too many requests right now. Please wait a moment and try again.";
+        errorContent = "️ I'm receiving too many requests right now. Please wait a moment and try again.";
       } else if (error.message?.includes('configured')) {
         errorContent = error.message;
       } else {
@@ -385,7 +385,7 @@ function DashboardContent() {
               )}>
                 <div className="flex items-start gap-4">
                   <div className="w-12 h-12 bg-red-500 rounded-2xl flex items-center justify-center shrink-0">
-                    <span className="text-white text-2xl">🚨</span>
+                    <span className="text-white text-2xl"></span>
                   </div>
                   <div className="flex-1">
                     <h3 className="font-bold text-lg mb-2">Chat Temporarily Disabled</h3>

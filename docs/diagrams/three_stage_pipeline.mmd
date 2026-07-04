@@ -1,0 +1,49 @@
+flowchart TD
+    UserMsg([User Message Input]):::user --> Stage1
+    
+    subgraph Stage1["Stage 1: Parallel Tool Orchestration (Gemini 2.5 Flash)"]
+        Intent[Analyze User Intent & Context]:::agent
+        RAGCheck{Educational / Psychology Query?}:::agent
+        
+        Intent --> RAGCheck
+        RAGCheck -->|Yes| ExecTools[Execute All 5 Retrieval Tools in Parallel]:::agent
+        RAGCheck -->|No| ExecToolsNoRAG[Execute 4 Core Vitals & Memory Tools]:::agent
+        
+        ExecTools --> T1["searchMemories (Mem0 Store)"]:::external
+        ExecTools --> T2["getUserProfile (Supabase DB)"]:::api
+        ExecTools --> T3["getFitbitHealthData (7-Day Vitals)"]:::api
+        ExecTools --> T4["getRecentWellness (30-Min Intraday)"]:::api
+        ExecTools --> T5["queryRAG (Pinecone Vector DB)"]:::database
+        
+        ExecToolsNoRAG --> T1
+        ExecToolsNoRAG --> T2
+        ExecToolsNoRAG --> T3
+        ExecToolsNoRAG --> T4
+        
+        T1 & T2 & T3 & T4 & T5 --> RawData[Raw Multi-Source Context Data<br/>~2,000 - 4,000 Tokens]:::frontend
+    end
+    
+    RawData --> Stage2
+    
+    subgraph Stage2["Stage 2: Context Compression (Gemini 2.5 Flash)"]
+        Compress[Synthesize raw metrics into 1-2 conversational sentences]:::agent
+        Summary["Compressed Context Summary<br/>~50 - 80 Tokens (95% Token Reduction)"]:::agent
+        Compress --> Summary
+    end
+    
+    Summary --> Stage3
+    
+    subgraph Stage3["Stage 3: Response Generation (DeepSeek / Ollama)"]
+        Inject[Inject Compressed Context + Conversation History]:::agent
+        Generate[Generate Empathetic & Metric-Informed Reply]:::agent
+        Inject --> Generate
+    end
+    
+    Generate --> Output([Final User Response]):::user
+
+    classDef user fill:#f3f4f6,stroke:#6b7280,stroke-width:1.5px,color:#111827;
+    classDef frontend fill:#dbeafe,stroke:#3b82f6,stroke-width:1.5px,color:#1e3a8a;
+    classDef api fill:#f3e8ff,stroke:#a855f7,stroke-width:1.5px,color:#581c87;
+    classDef agent fill:#fef3c7,stroke:#f59e0b,stroke-width:1.5px,color:#78350f;
+    classDef database fill:#dcfce7,stroke:#22c55e,stroke-width:1.5px,color:#14532d;
+    classDef external fill:#ffe4e6,stroke:#f43f5e,stroke-width:1.5px,color:#881337;

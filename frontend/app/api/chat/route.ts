@@ -9,7 +9,7 @@ import { buildDeepSeekPrompt, getContextSummary } from '@/lib/ollama/context-bui
 import { generateText as ollamaGenerateText } from '@/lib/ollama/client';
 
 export async function POST(request: NextRequest) {
-  console.log('🔵 CHAT: Received chat request');
+  console.log(' CHAT: Received chat request');
 
   try {
     const supabase = await createClient();
@@ -17,11 +17,11 @@ export async function POST(request: NextRequest) {
     const { data: { user }, error: authError } = await supabase.auth.getUser();
 
     if (authError || !user) {
-      console.error('🔴 CHAT: Auth failed:', authError?.message);
+      console.error(' CHAT: Auth failed:', authError?.message);
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
-    console.log('🟢 CHAT: User authenticated:', user.id.substring(0, 8) + '...');
+    console.log(' CHAT: User authenticated:', user.id.substring(0, 8) + '...');
 
     const body = await request.json();
     const { message, conversationHistory } = body;
@@ -30,13 +30,13 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Message is required' }, { status: 400 });
     }
 
-    console.log('🔵 CHAT: User message:', message.substring(0, 100));
+    console.log(' CHAT: User message:', message.substring(0, 100));
 
     // Check for SEVERE crisis
     const isSevereCrisis = detectSevereCrisis(message);
 
     if (isSevereCrisis) {
-      console.log('🚨🚨 CHAT: SEVERE CRISIS DETECTED - EMERGENCY PROTOCOL ACTIVATED');
+      console.log(' CHAT: SEVERE CRISIS DETECTED - EMERGENCY PROTOCOL ACTIVATED');
 
       // Get user profile with emergency contact
       const { data: profile } = await supabase
@@ -50,7 +50,7 @@ export async function POST(request: NextRequest) {
 
       // Send emergency email if contact is linked
       if (profile?.emergency_contact_email) {
-        console.log('📧 CHAT: Emergency contact found, sending alert...');
+        console.log(' CHAT: Emergency contact found, sending alert...');
 
         emailSent = await sendEmergencyAlert({
           emergencyContactEmail: profile.emergency_contact_email,
@@ -60,13 +60,13 @@ export async function POST(request: NextRequest) {
         });
 
         if (emailSent) {
-          console.log('✅ CHAT: Emergency alert email sent successfully');
-          emergencyResponse += '\n\n---\n\n**✅ Emergency Alert Sent**\n\nAn emergency notification has been sent to your emergency contact. Help is on the way.';
+          console.log(' CHAT: Emergency alert email sent successfully');
+          emergencyResponse += '\n\n---\n\n** Emergency Alert Sent**\n\nAn emergency notification has been sent to your emergency contact. Help is on the way.';
         } else {
-          console.warn('⚠️ CHAT: Failed to send emergency email');
+          console.warn('️ CHAT: Failed to send emergency email');
         }
       } else {
-        console.log('⚪ CHAT: No emergency contact linked');
+        console.log(' CHAT: No emergency contact linked');
         emergencyResponse += '\n\n---\n\n**ℹ️ No Emergency Contact Linked**\n\nConsider adding an emergency contact in your dashboard settings for faster support in crisis situations.';
       }
 
@@ -87,7 +87,7 @@ export async function POST(request: NextRequest) {
           },
         ]);
       } catch (dbError) {
-        console.warn('⚠️ CHAT: Failed to save emergency interaction:', dbError);
+        console.warn('️ CHAT: Failed to save emergency interaction:', dbError);
       }
 
       return NextResponse.json({
@@ -141,10 +141,10 @@ export async function POST(request: NextRequest) {
     let finalResponse = response;
     if (isCrisis) {
       finalResponse = response + '\n\n' + getEmergencyResourcesText();
-      console.log('🚨 CHAT: Crisis response enhanced with emergency resources');
+      console.log(' CHAT: Crisis response enhanced with emergency resources');
     }
 
-    console.log('🟢 CHAT: Response generated successfully');
+    console.log(' CHAT: Response generated successfully');
 
     // Store health insights in memory (background, non-blocking)
     if (context.healthAnalysis) {
@@ -161,7 +161,7 @@ export async function POST(request: NextRequest) {
         urgency: context.healthAnalysis.urgencyLevel,
         patterns: context.healthAnalysis.patterns,
       }).catch(error => {
-        console.warn('⚠️ CHAT: Failed to store health insights in memory:', error);
+        console.warn('️ CHAT: Failed to store health insights in memory:', error);
       });
     }
 
@@ -173,7 +173,7 @@ export async function POST(request: NextRequest) {
       ], {
         category: MEMORY_CATEGORIES.CONVERSATION,
       }).catch(error => {
-        console.warn('⚠️ CHAT: Failed to store conversation memory:', error);
+        console.warn('️ CHAT: Failed to store conversation memory:', error);
       });
     }
 
@@ -193,9 +193,9 @@ export async function POST(request: NextRequest) {
           created_at: new Date().toISOString(),
         },
       ]);
-      console.log('🟢 CHAT: Conversation saved to database');
+      console.log(' CHAT: Conversation saved to database');
     } catch (dbError) {
-      console.warn('⚠️ CHAT: Failed to save conversation:', dbError);
+      console.warn('️ CHAT: Failed to save conversation:', dbError);
     }
 
     return NextResponse.json({
@@ -215,7 +215,7 @@ export async function POST(request: NextRequest) {
     });
 
   } catch (error: any) {
-    console.error('🔴 CHAT: Error occurred:', {
+    console.error(' CHAT: Error occurred:', {
       message: error.message,
       stack: error.stack,
       name: error.name,

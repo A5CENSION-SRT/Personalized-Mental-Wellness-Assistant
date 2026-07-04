@@ -77,14 +77,14 @@ export async function processWithDocling(
   buffer: Buffer
 ): Promise<EnhancedDocumentChunk[]> {
   
-  console.log('🔵 DOCLING: Starting enhanced PDF processing...');
+  console.log(' DOCLING: Starting enhanced PDF processing...');
   
   // Step 1: Extract structured content from PDF
   const doclingOutput = await extractStructuredContent(buffer);
   
-  console.log(`📊 DOCLING: Found ${doclingOutput.tables.length} tables`);
-  console.log(`🖼️  DOCLING: Found ${doclingOutput.images.length} images`);
-  console.log(`📝 DOCLING: Found ${doclingOutput.textBlocks.length} text blocks`);
+  console.log(` DOCLING: Found ${doclingOutput.tables.length} tables`);
+  console.log(`️  DOCLING: Found ${doclingOutput.images.length} images`);
+  console.log(` DOCLING: Found ${doclingOutput.textBlocks.length} text blocks`);
   
   // Step 2: Convert to chunks with appropriate strategies
   const chunks: EnhancedDocumentChunk[] = [];
@@ -101,7 +101,7 @@ export async function processWithDocling(
   const textChunks = processTextContent(doclingOutput.textBlocks);
   chunks.push(...textChunks);
   
-  console.log(`✅ DOCLING: Created ${chunks.length} total chunks`);
+  console.log(` DOCLING: Created ${chunks.length} total chunks`);
   console.log(`   - Tables: ${tableChunks.length}`);
   console.log(`   - Images: ${imageChunks.length}`);
   console.log(`   - Text: ${textChunks.length}`);
@@ -152,7 +152,7 @@ async function callDocling(buffer: Buffer): Promise<any> {
   });
 
   try {
-    console.log('📡 Calling Docling API (async with JSON result)...');
+    console.log(' Calling Docling API (async with JSON result)...');
     
     // Submit async conversion task with JSON result
     const task = await client.convertSourceAsync({
@@ -173,30 +173,30 @@ async function callDocling(buffer: Buffer): Promise<any> {
       target: { kind: 'inbody' },
     });
 
-    console.log(`⏳ Task submitted (ID: ${task.taskId}), waiting for completion...`);
+    console.log(` Task submitted (ID: ${task.taskId}), waiting for completion...`);
 
     // Wait for task to complete
     try {
       await task.waitForCompletion();
     } catch (taskError: any) {
       // Task failed during processing
-      console.error('❌ Task failed during processing:', taskError.message);
+      console.error(' Task failed during processing:', taskError.message);
       throw taskError;
     }
     
-    console.log('✅ Task completed, fetching result...');
+    console.log(' Task completed, fetching result...');
 
     // Get the JSON result
     const result = await client.getTaskResult(task.taskId);
 
-    console.log('✅ Docling processing complete');
-    console.log('🔍 DEBUG: Result structure:', JSON.stringify(result, null, 2).slice(0, 500));
+    console.log(' Docling processing complete');
+    console.log(' DEBUG: Result structure:', JSON.stringify(result, null, 2).slice(0, 500));
 
     // Parse the Docling JSON response
     return parseDoclingResponse(result);
     
   } catch (error: any) {
-    console.error('❌ Docling API error:', error);
+    console.error(' Docling API error:', error);
     throw new Error(`Docling processing failed: ${error.message}`);
   }
 }
@@ -214,12 +214,12 @@ function parseDoclingResponse(doclingResult: any): {
   // Extract the actual document from the response
   const doc = doclingResult.document?.json_content || doclingResult.document || doclingResult;
   
-  console.log('🔍 Parsing document with keys:', Object.keys(doc).join(', '));
+  console.log(' Parsing document with keys:', Object.keys(doc).join(', '));
   
   // Extract tables
   const tables: DoclingTable[] = [];
   if (doc.tables && Array.isArray(doc.tables)) {
-    console.log(`📊 Processing ${doc.tables.length} tables...`);
+    console.log(` Processing ${doc.tables.length} tables...`);
     for (let i = 0; i < doc.tables.length; i++) {
       const table = doc.tables[i];
       const extractedData = extractTableDataFromCells(table);
@@ -239,7 +239,7 @@ function parseDoclingResponse(doclingResult: any): {
   // Extract images/figures
   const images: DoclingImage[] = [];
   if (doc.pictures && Array.isArray(doc.pictures)) {
-    console.log(`🖼️  Processing ${doc.pictures.length} pictures...`);
+    console.log(`️  Processing ${doc.pictures.length} pictures...`);
     for (const picture of doc.pictures) {
       images.push({
         format: picture.image?.format || 'png',
@@ -253,13 +253,13 @@ function parseDoclingResponse(doclingResult: any): {
   // Extract text blocks from body
   const textBlocks: DoclingTextBlock[] = [];
   if (doc.body) {
-    console.log('📝 Processing document body...');
+    console.log(' Processing document body...');
     textBlocks.push(...extractTextFromBody(doc.body, doc));
   }
 
   // Also try to get texts directly
   if (doc.texts && Array.isArray(doc.texts)) {
-    console.log(`📝 Processing ${doc.texts.length} text items...`);
+    console.log(` Processing ${doc.texts.length} text items...`);
     for (const text of doc.texts) {
       textBlocks.push({
         text: text.text || '',
@@ -273,7 +273,7 @@ function parseDoclingResponse(doclingResult: any): {
   const totalPages = doc.page_count || doc.num_pages || doc.pages?.length || 1;
   const hasScannedContent = doc.ocr_stats?.chars_from_ocr > 0 || false;
 
-  console.log(`✅ Extracted: ${tables.length} tables, ${images.length} images, ${textBlocks.length} text blocks`);
+  console.log(` Extracted: ${tables.length} tables, ${images.length} images, ${textBlocks.length} text blocks`);
 
   return {
     tables,
@@ -347,25 +347,25 @@ function resolveReference(ref: string, doc: any): any {
  * Helper: Extract table data from Docling table structure with cells
  */
 function extractTableDataFromCells(table: any): string[][] {
-  console.log('🔍 Table has keys:', Object.keys(table).join(', '));
-  console.log('🔍 Table.data type:', typeof table.data);
-  console.log('🔍 Has table_cells?', table.data?.table_cells ? 'YES' : 'NO');
+  console.log(' Table has keys:', Object.keys(table).join(', '));
+  console.log(' Table.data type:', typeof table.data);
+  console.log(' Has table_cells?', table.data?.table_cells ? 'YES' : 'NO');
   
   // Check if we have the new table_cells format
   if (table.data?.table_cells && Array.isArray(table.data.table_cells)) {
-    console.log('🔍 Using table_cells format with', table.data.table_cells.length, 'cells');
+    console.log(' Using table_cells format with', table.data.table_cells.length, 'cells');
     return convertTableCellsToGrid(table.data);
   }
   
   // Fallback: check if data is already a 2D array
   if (Array.isArray(table.data)) {
-    console.log('🔍 Data is already array');
+    console.log(' Data is already array');
     return table.data;
   }
   
   // Legacy format with cells property
   if (table.cells) {
-    console.log('🔍 Using legacy cells format');
+    console.log(' Using legacy cells format');
     const rows = table.num_rows || 0;
     const cols = table.num_cols || 0;
     const data: string[][] = Array(rows).fill(null).map(() => Array(cols).fill(''));
@@ -379,7 +379,7 @@ function extractTableDataFromCells(table: any): string[][] {
     return data;
   }
   
-  console.log('❌ No valid table data format found');
+  console.log(' No valid table data format found');
   return [];
 }
 

@@ -25,7 +25,7 @@ export function getFlashClient(): GoogleGenAI {
         }
 
         flashClient = new GoogleGenAI({ apiKey });
-        console.log('🟢 FLASH: Gemini Flash client initialized');
+        console.log(' FLASH: Gemini Flash client initialized');
     }
 
     return flashClient;
@@ -57,7 +57,7 @@ export async function checkFlashHealth(): Promise<boolean> {
         });
         return !!response;
     } catch (error: any) {
-        console.error('🔴 FLASH: Health check failed:', error.message);
+        console.error(' FLASH: Health check failed:', error.message);
         return false;
     }
 }

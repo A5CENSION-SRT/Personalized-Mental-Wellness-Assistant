@@ -19,7 +19,7 @@ import {
  * - SpO2 (blood oxygen - fatigue indicator)
  */
 export async function GET(request: NextRequest) {
-    console.log('🔵 WELLNESS: Starting intraday wellness fetch');
+    console.log(' WELLNESS: Starting intraday wellness fetch');
 
     try {
         const supabase = await createClient();
@@ -28,14 +28,14 @@ export async function GET(request: NextRequest) {
         const { data: { user }, error: authError } = await supabase.auth.getUser();
 
         if (authError || !user) {
-            console.error('🔴 WELLNESS: Auth failed:', authError?.message);
+            console.error(' WELLNESS: Auth failed:', authError?.message);
             return NextResponse.json(
                 { error: 'Unauthorized' },
                 { status: 401 }
             );
         }
 
-        console.log('🟢 WELLNESS: User authenticated:', user.id.substring(0, 8) + '...');
+        console.log(' WELLNESS: User authenticated:', user.id.substring(0, 8) + '...');
 
         // Get time range (last 30 minutes)
         const now = new Date();
@@ -44,10 +44,10 @@ export async function GET(request: NextRequest) {
         const endTime = now.toTimeString().substring(0, 5); // "HH:MM"
         const startTime = thirtyMinAgo.toTimeString().substring(0, 5);
 
-        console.log('🔵 WELLNESS: Time range:', startTime, '-', endTime);
+        console.log(' WELLNESS: Time range:', startTime, '-', endTime);
 
         // Fetch all metrics in parallel
-        console.log('🔵 WELLNESS: Fetching metrics in parallel...');
+        console.log(' WELLNESS: Fetching metrics in parallel...');
         const [heartRateResult, hrvResult, activityResult, breathingResult, spo2Result] =
             await Promise.allSettled([
                 fetchIntradayHeartRate(user.id, 'today', '1min', startTime, endTime),
@@ -71,10 +71,10 @@ export async function GET(request: NextRequest) {
                 const min = Math.min(...values);
 
                 heartRate = { current, avg, max, min, dataset: values };
-                console.log('🟢 WELLNESS: Heart rate -', current, 'bpm (avg:', avg, ')');
+                console.log(' WELLNESS: Heart rate -', current, 'bpm (avg:', avg, ')');
             }
         } else {
-            console.warn('⚠️ WELLNESS: Heart rate fetch failed:', heartRateResult.reason?.message);
+            console.warn('️ WELLNESS: Heart rate fetch failed:', heartRateResult.reason?.message);
         }
 
         // Process HRV
@@ -90,10 +90,10 @@ export async function GET(request: NextRequest) {
                     deep: deepRmssd,
                     status: dailyRmssd > 40 ? 'good' : dailyRmssd > 20 ? 'normal' : 'low'
                 };
-                console.log('🟢 WELLNESS: HRV -', dailyRmssd, 'ms (', hrv.status, ')');
+                console.log(' WELLNESS: HRV -', dailyRmssd, 'ms (', hrv.status, ')');
             }
         } else {
-            console.warn('⚠️ WELLNESS: HRV fetch failed:', hrvResult.reason?.message);
+            console.warn('️ WELLNESS: HRV fetch failed:', hrvResult.reason?.message);
         }
 
         // Process Activity (calories with activity level)
@@ -117,10 +117,10 @@ export async function GET(request: NextRequest) {
                     status: activityStatus,
                     dataset: dataset.map((d: any) => ({ time: d.time, value: d.value, level: d.level }))
                 };
-                console.log('🟢 WELLNESS: Activity -', totalCalories, 'cal,', activityStatus);
+                console.log(' WELLNESS: Activity -', totalCalories, 'cal,', activityStatus);
             }
         } else {
-            console.warn('⚠️ WELLNESS: Activity fetch failed:', activityResult.reason?.message);
+            console.warn('️ WELLNESS: Activity fetch failed:', activityResult.reason?.message);
         }
 
         // Process Breathing Rate
@@ -135,10 +135,10 @@ export async function GET(request: NextRequest) {
                     status: breathingRate > 18 ? 'elevated' :
                         breathingRate > 12 ? 'normal' : 'low'
                 };
-                console.log('🟢 WELLNESS: Breathing -', breathingRate, 'bpm (', breathing.status, ')');
+                console.log(' WELLNESS: Breathing -', breathingRate, 'bpm (', breathing.status, ')');
             }
         } else {
-            console.warn('⚠️ WELLNESS: Breathing fetch failed:', breathingResult.reason?.message);
+            console.warn('️ WELLNESS: Breathing fetch failed:', breathingResult.reason?.message);
         }
 
         // Process SpO2
@@ -153,10 +153,10 @@ export async function GET(request: NextRequest) {
                     status: spo2Value > 95 ? 'healthy' :
                         spo2Value > 90 ? 'fair' : 'low'
                 };
-                console.log('🟢 WELLNESS: SpO2 -', spo2Value, '% (', spo2.status, ')');
+                console.log(' WELLNESS: SpO2 -', spo2Value, '% (', spo2.status, ')');
             }
         } else {
-            console.warn('⚠️ WELLNESS: SpO2 fetch failed:', spo2Result.reason?.message);
+            console.warn('️ WELLNESS: SpO2 fetch failed:', spo2Result.reason?.message);
         }
 
         // Calculate mental health indicators
@@ -168,7 +168,7 @@ export async function GET(request: NextRequest) {
             spo2
         });
 
-        console.log('🧠 WELLNESS: Mental health indicators calculated:', mentalHealthIndicators);
+        console.log(' WELLNESS: Mental health indicators calculated:', mentalHealthIndicators);
 
         const response = {
             timestamp: now.toISOString(),
@@ -183,12 +183,12 @@ export async function GET(request: NextRequest) {
             mentalHealthIndicators,
         };
 
-        console.log('🟢 WELLNESS: Wellness data compiled successfully');
+        console.log(' WELLNESS: Wellness data compiled successfully');
 
         return NextResponse.json(response);
 
     } catch (error: any) {
-        console.error('🔴 WELLNESS: Error fetching wellness data:', error);
+        console.error(' WELLNESS: Error fetching wellness data:', error);
         return NextResponse.json(
             { error: error.message || 'Failed to fetch wellness data' },
             { status: 500 }

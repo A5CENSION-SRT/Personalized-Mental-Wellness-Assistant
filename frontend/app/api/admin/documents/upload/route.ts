@@ -44,14 +44,14 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'File size exceeds 50MB limit' }, { status: 400 });
     }
 
-    console.log(`📄 Processing PDF: ${file.name} (${(file.size / 1024).toFixed(1)} KB)`);
+    console.log(` Processing PDF: ${file.name} (${(file.size / 1024).toFixed(1)} KB)`);
 
     // Convert to buffer
     const bytes = await file.arrayBuffer();
     const buffer = Buffer.from(bytes);
 
     // Process with Docling
-    console.log('🔄 Extracting content with Docling...');
+    console.log(' Extracting content with Docling...');
     const chunks = await processWithDocling(buffer);
 
     if (!chunks || chunks.length === 0) {
@@ -60,7 +60,7 @@ export async function POST(request: NextRequest) {
       }, { status: 400 });
     }
 
-    console.log(`✅ Extracted ${chunks.length} chunks from ${file.name}`);
+    console.log(` Extracted ${chunks.length} chunks from ${file.name}`);
 
     // Calculate detailed statistics
     const stats = chunks.reduce((acc, chunk) => {
@@ -77,18 +77,18 @@ export async function POST(request: NextRequest) {
       .filter(p => p > 0);
     const totalPages = allPages.length > 0 ? Math.max(...allPages) : 1;
 
-    console.log(`📊 Statistics: ${stats.text} text, ${stats.table} tables, ${stats.image} images across ${totalPages} pages`);
+    console.log(` Statistics: ${stats.text} text, ${stats.table} tables, ${stats.image} images across ${totalPages} pages`);
 
     // Generate unique document ID
     const docId = crypto.randomUUID();
 
     // Store vectors in Pinecone
-    console.log(`💾 Storing ${chunks.length} vectors in Pinecone...`);
+    console.log(` Storing ${chunks.length} vectors in Pinecone...`);
     try {
       await storeInPinecone(chunks, docId, file.name);
-      console.log('✅ Successfully stored vectors in Pinecone');
+      console.log(' Successfully stored vectors in Pinecone');
     } catch (pineconeError: any) {
-      console.error('❌ Pinecone storage error:', pineconeError);
+      console.error(' Pinecone storage error:', pineconeError);
       return NextResponse.json({ 
         error: `Failed to store vectors in Pinecone: ${pineconeError.message}` 
       }, { status: 500 });
@@ -98,7 +98,7 @@ export async function POST(request: NextRequest) {
     const processingTime = (Date.now() - startTime) / 1000;
 
     // Save metadata to Supabase
-    console.log('💾 Saving document metadata to Supabase...');
+    console.log(' Saving document metadata to Supabase...');
     const { data: document, error: dbError } = await supabase
       .from('admin_documents')
       .insert({
@@ -131,7 +131,7 @@ export async function POST(request: NextRequest) {
       .single();
 
     if (dbError) {
-      console.error('❌ Database error:', dbError);
+      console.error(' Database error:', dbError);
       // Try to clean up Pinecone vectors if database save failed
       // Note: You might want to implement cleanup logic here
       return NextResponse.json({ 
@@ -139,7 +139,7 @@ export async function POST(request: NextRequest) {
       }, { status: 500 });
     }
 
-    console.log(`✅ Document uploaded successfully in ${processingTime.toFixed(2)}s`);
+    console.log(` Document uploaded successfully in ${processingTime.toFixed(2)}s`);
 
     // Return success response with detailed stats
     return NextResponse.json({
@@ -160,7 +160,7 @@ export async function POST(request: NextRequest) {
     });
 
   } catch (error: any) {
-    console.error('❌ Upload error:', error);
+    console.error(' Upload error:', error);
     
     // Provide more specific error messages
     let errorMessage = 'Upload failed';

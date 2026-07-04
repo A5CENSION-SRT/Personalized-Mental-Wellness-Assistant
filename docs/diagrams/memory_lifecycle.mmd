@@ -1,0 +1,31 @@
+flowchart TD
+    subgraph MemoryRetrieval["Memory Retrieval Stage (Pre-Chat)"]
+        UserPrompt[User Message Prompt]:::user --> SearchMemoriesAPI["Mem0 searchMemories() API"]:::api
+        SearchMemoriesAPI --> EmbedQuery[Generate Query Embedding]:::agent
+        EmbedQuery --> CosineSearch[Vector Similarity Search]:::agent
+        CosineSearch --> Mem0DB[("Mem0 Vector Database")]:::database
+        Mem0DB --> TopMemories[Return Top 5 Semantic Memories]:::frontend
+    end
+    
+    TopMemories --> SummarizerEngine[Gemini 2.5 Flash Summarizer]:::agent
+    
+    subgraph MemoryStorage["Memory Extraction & Storage Stage (Post-Chat)"]
+        ChatResponse[DeepSeek Generates Response]:::agent --> ExtractInsights[Extract Health & Personal Insights]:::agent
+        ExtractInsights --> FormatInsights[formatAIInsightsForMemory]:::agent
+        FormatInsights --> AddMemoryAPI["Mem0 addMemory() API"]:::api
+        AddMemoryAPI --> Categorize[Auto-Categorize Memory]:::agent
+        
+        Categorize --> CatHealth["health"]:::external
+        Categorize --> CatInsights["conversation_insights"]:::external
+        Categorize --> CatPrefs["user_preferences"]:::external
+        Categorize --> CatMilestones["milestones"]:::external
+        
+        CatHealth & CatInsights & CatPrefs & CatMilestones --> IndexStore[("Upsert Embedding into Mem0 DB")]:::database
+    end
+
+    classDef user fill:#f3f4f6,stroke:#6b7280,stroke-width:1.5px,color:#111827;
+    classDef frontend fill:#dbeafe,stroke:#3b82f6,stroke-width:1.5px,color:#1e3a8a;
+    classDef api fill:#f3e8ff,stroke:#a855f7,stroke-width:1.5px,color:#581c87;
+    classDef agent fill:#fef3c7,stroke:#f59e0b,stroke-width:1.5px,color:#78350f;
+    classDef database fill:#dcfce7,stroke:#22c55e,stroke-width:1.5px,color:#14532d;
+    classDef external fill:#ffe4e6,stroke:#f43f5e,stroke-width:1.5px,color:#881337;

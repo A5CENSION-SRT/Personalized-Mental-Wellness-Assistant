@@ -57,7 +57,7 @@ export async function checkOllamaHealth(): Promise<boolean> {
         });
         return response.ok;
     } catch (error) {
-        console.error('🔴 OLLAMA: Service not reachable at', OLLAMA_BASE_URL);
+        console.error(' OLLAMA: Service not reachable at', OLLAMA_BASE_URL);
         return false;
     }
 }
@@ -79,7 +79,7 @@ export async function listOllamaModels(): Promise<string[]> {
         const data = await response.json();
         return data.models?.map((m: any) => m.name) || [];
     } catch (error: any) {
-        console.error('🔴 OLLAMA: Error listing models:', error.message);
+        console.error(' OLLAMA: Error listing models:', error.message);
         return [];
     }
 }
@@ -98,7 +98,7 @@ export async function generateText(
 ): Promise<string> {
     const model = options?.model || OLLAMA_MODEL;
 
-    console.log(`🔵 OLLAMA: Generating text with model: ${model}`);
+    console.log(` OLLAMA: Generating text with model: ${model}`);
 
     try {
         const response = await fetch(`${OLLAMA_BASE_URL}/api/generate`, {
@@ -124,11 +124,11 @@ export async function generateText(
         }
 
         const data: OllamaGenerateResponse = await response.json();
-        console.log('🟢 OLLAMA: Text generation complete');
+        console.log(' OLLAMA: Text generation complete');
 
         return data.response;
     } catch (error: any) {
-        console.error('🔴 OLLAMA: Generation error:', error.message);
+        console.error(' OLLAMA: Generation error:', error.message);
 
         if (error.name === 'TimeoutError' || error.message?.includes('timeout')) {
             throw new Error('Ollama request timed out. The model may be loading or the prompt is too long.');
@@ -157,7 +157,7 @@ export async function generateChatResponse(
 ): Promise<string> {
     const model = options?.model || OLLAMA_MODEL;
 
-    console.log(`🔵 OLLAMA: Chat generation with model: ${model}`);
+    console.log(` OLLAMA: Chat generation with model: ${model}`);
 
     // Prepend system prompt if provided
     const allMessages = options?.systemPrompt
@@ -188,11 +188,11 @@ export async function generateChatResponse(
         }
 
         const data: OllamaChatResponse = await response.json();
-        console.log('🟢 OLLAMA: Chat response generated');
+        console.log(' OLLAMA: Chat response generated');
 
         return data.message.content;
     } catch (error: any) {
-        console.error('🔴 OLLAMA: Chat error:', error.message);
+        console.error(' OLLAMA: Chat error:', error.message);
 
         if (error.name === 'TimeoutError' || error.message?.includes('timeout')) {
             throw new Error('Ollama request timed out. The model may be loading or the conversation is too long.');
@@ -224,7 +224,7 @@ export async function generateEmbedding(
 ): Promise<number[]> {
     const model = options?.model || OLLAMA_EMBED_MODEL;
 
-    console.log(`🔵 OLLAMA: Generating embedding with model: ${model}`);
+    console.log(` OLLAMA: Generating embedding with model: ${model}`);
 
     try {
         const response = await fetch(`${OLLAMA_BASE_URL}/api/embeddings`, {
@@ -250,11 +250,11 @@ export async function generateEmbedding(
             throw new Error('Invalid embedding response from Ollama');
         }
 
-        console.log(`🟢 OLLAMA: Embedding generated (${data.embedding.length} dimensions)`);
+        console.log(` OLLAMA: Embedding generated (${data.embedding.length} dimensions)`);
 
         return data.embedding;
     } catch (error: any) {
-        console.error('🔴 OLLAMA: Embedding error:', error.message);
+        console.error(' OLLAMA: Embedding error:', error.message);
 
         if (error.name === 'TimeoutError' || error.message?.includes('timeout')) {
             throw new Error('Ollama embedding request timed out.');

@@ -27,11 +27,11 @@ const createTransporter = () => {
 
 export async function sendEmergencyAlert(data: EmergencyEmailData): Promise<boolean> {
   try {
-    console.log('📧 Sending emergency alert to:', data.emergencyContactEmail);
+    console.log(' Sending emergency alert to:', data.emergencyContactEmail);
     
     const transporter = createTransporter();
     
-    const message = `🚨 URGENT: Mental Health Emergency Alert
+    const message = ` URGENT: Mental Health Emergency Alert
 
 ${data.userName} (${data.userEmail}) has expressed concerning thoughts that may indicate a crisis.
 
@@ -53,21 +53,21 @@ IF IN IMMEDIATE DANGER:
 - Go to nearest hospital emergency room
 - Contact campus security
 
-This is an automated alert from DTL Mental Health Chatbot.
+This is an automated alert from Personalized Mental Wellness Assistant.
 `;
 
     await transporter.sendMail({
       from: process.env.EMAIL_FROM || process.env.EMAIL_USER,
       to: data.emergencyContactEmail,
-      subject: `🚨 URGENT: Emergency Alert for ${data.userName}`,
+      subject: ` URGENT: Emergency Alert for ${data.userName}`,
       text: message,
       priority: 'high',
     });
     
-    console.log('✅ Emergency alert sent successfully');
+    console.log(' Emergency alert sent successfully');
     return true;
   } catch (error: any) {
-    console.error('❌ Failed to send emergency alert:', error);
+    console.error(' Failed to send emergency alert:', error);
     return false;
   }
 }
